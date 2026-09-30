@@ -1,0 +1,29 @@
+---
+import { ArrowUpRight } from '@lucide/astro';
+
+import { NAV_ITEMS, SITE } from '../config/site';
+
+const year = new Date().getFullYear();
+---
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div class="footer-bar">
+      <a class="footer-brand" href="/">{SITE.name}</a>
+      <nav aria-label="页脚导航">
+        {NAV_ITEMS.map((item) => <a href={item.href}>{item.label}</a>)}
+      </nav>
+      <div class="footer-meta">
+        {
+          SITE.social.github && (
+            <a href={SITE.social.github} target="_blank" rel="noreferrer">
+              GitHub
+              <ArrowUpRight size={14} aria-hidden="true" />
+            </a>
+          )
+        }
+        <span>© {year} {SITE.author}</span>
+      </div>
+    </div>
+  </div>
+</footer>

@@ -1,0 +1,37 @@
+---
+import { render } from 'astro:content';
+
+import {
+  AudioPlayer,
+  Callout,
+  Gallery,
+  LinkCard,
+  Mermaid,
+  VideoEmbed,
+} from '../../components/content';
+import PostLayout from '../../layouts/PostLayout.astro';
+import { getPosts } from '../../lib/posts';
+
+export async function getStaticPaths() {
+  const posts = await getPosts();
+  return posts.map((post) => ({
+    params: { slug: post.id },
+    props: { post, allPosts: posts },
+  }));
+}
+
+const { post, allPosts } = Astro.props;
+const { Content, headings } = await render(post);
+const components = {
+  AudioPlayer,
+  Callout,
+  Gallery,
+  LinkCard,
+  Mermaid,
+  VideoEmbed,
+};
+---
+
+<PostLayout post={post} headings={headings} allPosts={allPosts}>
+  <Content components={components} />
+</PostLayout>

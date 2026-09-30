@@ -1,0 +1,65 @@
+---
+title: '把个人博客做成一套安静、可靠的工作流'
+description: '从 Markdown 写作到静态构建，记录这个 Astro 博客首版背后的结构与取舍。'
+publishedAt: 2026-08-07
+tags:
+  - Astro
+  - 前端工程
+  - 建站
+featured: false
+draft: false
+---
+
+一个个人博客最重要的能力，不是功能最多，而是多年以后仍然愿意打开编辑器继续写。
+
+这个站点选择 Astro 和 Markdown，核心原因也很简单：内容可以留在 Git 中，页面默认生成静态文件，复杂交互只在真正需要的位置加载。
+
+## 内容先于界面
+
+文章被放在统一的内容集合中。标题、摘要、日期和标签由结构化的 frontmatter 管理，正文仍然是普通 Markdown 或 MDX。
+
+```yaml
+title: '文章标题'
+description: '一句清楚的摘要'
+publishedAt: 2026-08-08
+tags:
+  - Astro
+  - 建站
+```
+
+<Callout type="tip" title="保持内容可迁移">
+  文章本身不依赖数据库，也不要求在某个后台中编辑。即使未来更换框架，Markdown
+  文件仍然可以继续使用。
+</Callout>
+
+## 一次构建经过什么
+
+<Mermaid
+  title="从文章到静态页面"
+  chart={`flowchart LR
+    A[Markdown / MDX] --> B[Content Collection]
+    B --> C[Astro 页面]
+    C --> D[静态构建]
+    D --> E[Pagefind 索引]
+    E --> F[可部署站点]`}
+/>
+
+生产构建会先生成页面，再让 Pagefind 扫描最终 HTML。这样搜索功能不需要额外的服务器，也不会把正文发送给第三方服务。
+
+## 动效应该有边界
+
+首版使用 GSAP 和 Lenis 提供更顺滑的进入、滚动与轻量视差效果，但同时遵守两条边界：
+
+1. 移动端减少高成本效果。
+2. 系统开启“减少动态效果”后，页面应直接显示内容。
+
+动效的任务是帮助建立节奏和层次，不应该妨碍阅读。
+
+## 继续阅读
+
+<LinkCard
+  href="https://docs.astro.build/zh-cn/guides/content-collections/"
+  title="Astro 内容集合文档"
+  description="了解内容模式、查询与渲染的官方说明。"
+  label="官方文档"
+/>

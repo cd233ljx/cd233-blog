@@ -1,0 +1,83 @@
+---
+import { ExternalLink, Play } from '@lucide/astro';
+
+interface Props {
+  provider: 'youtube' | 'bilibili';
+  id: string;
+  title: string;
+  description?: string;
+}
+
+const { provider, id, title, description } = Astro.props;
+const watchUrl =
+  provider === 'youtube'
+    ? `https://www.youtube.com/watch?v=${encodeURIComponent(id)}`
+    : `https://www.bilibili.com/video/${encodeURIComponent(id)}`;
+---
+
+<figure
+  class="video-embed"
+  data-video-embed
+  data-provider={provider}
+  data-video-id={id}
+  data-video-title={title}
+>
+  <div class="video-placeholder">
+    <span class="video-provider"
+      >{provider === 'youtube' ? 'YOUTUBE' : 'BILIBILI'}</span
+    >
+    <button
+      class="video-play"
+      type="button"
+      data-video-play
+      aria-label={`播放：${title}`}
+    >
+      <Play size={24} fill="currentColor" aria-hidden="true" />
+    </button>
+    <div class="video-copy">
+      <strong>{title}</strong>
+      {description && <span>{description}</span>}
+    </div>
+  </div>
+  <figcaption>
+    点击播放后才会连接第三方视频服务。
+    <a href={watchUrl} target="_blank" rel="noreferrer">
+      在原网站打开
+      <ExternalLink size={13} aria-hidden="true" />
+    </a>
+  </figcaption>
+</figure>
+
+<script>
+  function bindVideoEmbeds() {
+    document
+      .querySelectorAll<HTMLElement>('[data-video-embed]')
+      .forEach((container) => {
+        const button =
+          container.querySelector<HTMLButtonElement>('[data-video-play]');
+        if (!button || button.dataset.bound === 'true') return;
+        button.dataset.bound = 'true';
+        button.addEventListener('click', () => {
+          const provider = container.dataset.provider;
+          const id = container.dataset.videoId ?? '';
+          const title = container.dataset.videoTitle ?? '视频';
+          const source =
+            provider === 'youtube'
+              ? `https://www.youtube-nocookie.com/embed/${encodeURIComponent(id)}?autoplay=1&rel=0`
+              : `https://player.bilibili.com/player.html?bvid=${encodeURIComponent(id)}&high_quality=1&autoplay=1`;
+          const iframe = document.createElement('iframe');
+          iframe.src = source;
+          iframe.title = title;
+          iframe.loading = 'lazy';
+          iframe.allow =
+            'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share';
+          iframe.allowFullscreen = true;
+          iframe.referrerPolicy = 'strict-origin-when-cross-origin';
+          container.querySelector('.video-placeholder')?.replaceWith(iframe);
+        });
+      });
+  }
+
+  document.addEventListener('astro:page-load', bindVideoEmbeds);
+  bindVideoEmbeds();
+</script>

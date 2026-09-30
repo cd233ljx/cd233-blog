@@ -1,0 +1,170 @@
+---
+import { Search } from '@lucide/astro';
+
+import BaseLayout from '../../layouts/BaseLayout.astro';
+---
+
+<BaseLayout title="搜索" description="搜索 CD233 Blog 的全部已发布内容。">
+  <header class="page-hero search-hero page-container">
+    <h1>搜索</h1>
+    <p>搜索标题与正文。</p>
+  </header>
+
+  <section class="search-section page-container">
+    <div class="search-box">
+      <Search size={20} aria-hidden="true" />
+      <label class="sr-only" for="site-search">搜索文章</label>
+      <input
+        id="site-search"
+        type="search"
+        placeholder="搜索技术、工具或某个想法…"
+        autocomplete="off"
+        data-search-input
+      />
+      <kbd>ESC</kbd>
+    </div>
+    <p class="search-status" data-search-status aria-live="polite">
+      输入至少两个字符开始搜索。
+    </p>
+    <div class="search-results" data-search-results></div>
+    <noscript>
+      搜索需要启用 JavaScript，也可以直接浏览<a href="/posts/">全部文章</a>。
+    </noscript>
+  </section>
+</BaseLayout>
+
+<script>
+  interface SearchItem {
+    url: string;
+    meta: { title?: string };
+    excerpt: string;
+  }
+
+  interface Pagefind {
+    search(query: string): Promise<{
+      results: { data(): Promise<SearchItem> }[];
+    }>;
+  }
+
+  let pagefindPromise: Promise<Pagefind> | undefined;
+  let cleanup: (() => void) | undefined;
+
+  function loadPagefind() {
+    if (!pagefindPromise) {
+      const modulePath = '/pagefind/pagefind.js';
+      pagefindPromise = import(/* @vite-ignore */ modulePath);
+      pagefindPromise?.catch(() => {
+        pagefindPromise = undefined;
+      });
+    }
+    return pagefindPromise;
+  }
+
+  function bindSearch() {
+    cleanup?.();
+    const input = document.querySelector<HTMLInputElement>(
+      '[data-search-input]',
+    );
+    const results = document.querySelector<HTMLElement>(
+      '[data-search-results]',
+    );
+    const status = document.querySelector<HTMLElement>('[data-search-status]');
+    if (!input || !results || !status) return;
+
+    const controller = new AbortController();
+    let timer = 0;
+    let queryVersion = 0;
+    const reset = () => {
+      queryVersion++;
+      window.clearTimeout(timer);
+      results.replaceChildren();
+      status.textContent = '输入至少两个字符开始搜索。';
+    };
+
+    const runSearch = async () => {
+      const version = ++queryVersion;
+      const query = input.value.trim();
+      results.replaceChildren();
+      if (query.length < 2) {
+        status.textContent = '输入至少两个字符开始搜索。';
+        return;
+      }
+
+      const isCurrent = () =>
+        version === queryVersion && !controller.signal.aborted;
+      status.textContent = '正在搜索…';
+      try {
+        const pagefind = await loadPagefind();
+        if (!pagefind || !isCurrent()) return;
+        const response = await pagefind.search(query);
+        if (!isCurrent()) return;
+        const items = await Promise.all(
+          response.results.slice(0, 20).map((result) => result.data()),
+        );
+        if (!isCurrent()) return;
+
+        const total = response.results.length;
+        status.textContent =
+          total > 20
+            ? `找到 ${total} 条结果，显示前 20 条。`
+            : total > 0
+              ? `找到 ${total} 条结果`
+              : '没有找到相关内容。';
+        const fragment = document.createDocumentFragment();
+        items.forEach((item) => {
+          const article = document.createElement('article');
+          article.className = 'search-result';
+          const link = document.createElement('a');
+          link.href = item.url;
+          const title = document.createElement('h2');
+          title.textContent = item.meta.title ?? '未命名文章';
+          const excerpt = document.createElement('p');
+          // Excerpts come from this site's build-time Pagefind index.
+          excerpt.innerHTML = item.excerpt;
+          link.append(title, excerpt);
+          article.append(link);
+          fragment.append(article);
+        });
+        results.append(fragment);
+      } catch {
+        if (isCurrent()) {
+          status.textContent = '搜索暂时不可用，请先从文章页浏览。';
+        }
+      }
+    };
+
+    input.addEventListener(
+      'input',
+      () => {
+        reset();
+        timer = window.setTimeout(runSearch, 180);
+      },
+      { signal: controller.signal },
+    );
+    input.addEventListener(
+      'keydown',
+      (event) => {
+        if (event.key === 'Escape') {
+          input.value = '';
+          reset();
+        }
+      },
+      { signal: controller.signal },
+    );
+    cleanup = () => {
+      controller.abort();
+      reset();
+    };
+
+    input.focus({ preventScroll: true });
+    const initial = new URL(window.location.href).searchParams.get('q');
+    if (initial) {
+      input.value = initial;
+      void runSearch();
+    }
+  }
+
+  document.addEventListener('astro:before-swap', () => cleanup?.());
+  document.addEventListener('astro:page-load', bindSearch);
+  bindSearch();
+</script>

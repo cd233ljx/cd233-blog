@@ -1,0 +1,36 @@
+---
+import { SITE } from '../../config/site';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+---
+
+<BaseLayout title="关于" description={`关于 ${SITE.author} 和这个博客。`}>
+  <header class="about-hero page-container">
+    <div class="about-copy">
+      <h1>你好，我是 {SITE.author}。</h1>
+      <p class="about-lead">
+        这是我的个人博客，用来放技术笔记和日常杂谈。<br />
+        有些问题想明白了就写下来，有些还在慢慢琢磨。
+      </p>
+    </div>
+  </header>
+
+  <div class="about-notes page-container">
+    <section>
+      <h2>这里写些什么</h2>
+      <p>
+        开发中碰到的问题、试过的工具、学习时留下的笔记，
+        还有技术之外的零碎想法。写下来，方便自己回头查，也希望能对路过的人有用。
+      </p>
+    </section>
+    <section>
+      <h2>从哪里开始</h2>
+      <p>
+        新来的话，可以先翻翻<a href="/posts/">全部文章</a>。
+        想按时间找旧记录，可以看<a href="/archive/">归档</a>；
+        想找某个话题，可以从<a href="/tags/">标签</a>或<a href="/search/"
+          >搜索</a
+        >开始。
+      </p>
+    </section>
+  </div>
+</BaseLayout>

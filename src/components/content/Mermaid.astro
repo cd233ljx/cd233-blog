@@ -1,0 +1,57 @@
+---
+interface Props {
+  chart: string;
+  title?: string;
+}
+
+const { chart, title = '图表' } = Astro.props;
+---
+
+<figure class="mermaid-figure">
+  <figcaption>{title}</figcaption>
+  <pre class="mermaid" data-mermaid data-source={chart} set:text={chart} />
+</figure>
+
+<script>
+  async function renderMermaidCharts() {
+    const nodes = [
+      ...document.querySelectorAll<HTMLElement>('[data-mermaid]'),
+    ].filter((node) => node.dataset.processed !== 'true');
+    if (!nodes.length) return;
+
+    const { default: mermaid } = await import('mermaid');
+    const styles = getComputedStyle(document.documentElement);
+    const token = (name: string, fallback: string) =>
+      styles.getPropertyValue(name).trim() || fallback;
+
+    mermaid.initialize({
+      startOnLoad: false,
+      securityLevel: 'strict',
+      theme: 'base',
+      fontFamily:
+        'ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "PingFang SC", sans-serif',
+      themeVariables: {
+        background: token('--surface', '#ffffff'),
+        primaryColor: token('--surface-muted', '#ecece9'),
+        primaryTextColor: token('--ink', '#181817'),
+        primaryBorderColor: token('--strong-line', '#b9b9b2'),
+        lineColor: token('--muted', '#6f6f6a'),
+        secondaryColor: token('--paper', '#f7f7f5'),
+        tertiaryColor: token('--surface', '#ffffff'),
+      },
+    });
+    await mermaid.run({ nodes });
+  }
+
+  async function rerenderMermaidCharts() {
+    document.querySelectorAll<HTMLElement>('[data-mermaid]').forEach((node) => {
+      node.removeAttribute('data-processed');
+      node.textContent = node.dataset.source ?? '';
+    });
+    await renderMermaidCharts();
+  }
+
+  document.addEventListener('astro:page-load', renderMermaidCharts);
+  window.addEventListener('themechange', rerenderMermaidCharts);
+  renderMermaidCharts();
+</script>

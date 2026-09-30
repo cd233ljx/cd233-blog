@@ -1,0 +1,203 @@
+/* Current theme. Keep the tag pool as a deliberate part of this blog. */
+
+:root {
+  color-scheme: light;
+  --paper: #ffffff;
+  --surface: #f7f7f7;
+  --surface-muted: #f2f3f2;
+  --ink: #202020;
+  --body-ink: #555555;
+  --muted: #707070;
+  --faint: #707070;
+  --line: #e6e6e6;
+  --strong-line: #b7b7b7;
+  --red: #287b66;
+  --red-ink: #216b59;
+  --reservoir-water: #e2ede8;
+  --ambient-ink: #727c74;
+  --ambient-opacity: 0.5;
+  --radius-sm: 0.35rem;
+  --radius-md: 0.65rem;
+  --radius-lg: 0.75rem;
+}
+
+:root[data-theme='dark'] {
+  color-scheme: dark;
+  --paper: #151515;
+  --surface: #1e1e1e;
+  --surface-muted: #252525;
+  --ink: #e8e8e8;
+  --body-ink: #b5b5b5;
+  --muted: #a3a3a3;
+  --faint: #a3a3a3;
+  --line: #303030;
+  --strong-line: #555555;
+  --red: #75bda6;
+  --red-ink: #88cbb5;
+  --reservoir-water: #20352e;
+  --ambient-ink: #96a298;
+  --ambient-opacity: 0.38;
+}
+
+.ambient-backdrop {
+  position: fixed;
+  z-index: -1;
+  inset: 0;
+  display: none;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.ambient-backdrop canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+@media (min-width: 1100px) {
+  body {
+    isolation: isolate;
+  }
+
+  .ambient-backdrop {
+    display: block;
+  }
+}
+
+@media print {
+  .ambient-backdrop {
+    display: none;
+  }
+}
+
+.tag-reservoir {
+  position: relative;
+  overflow: hidden;
+  min-height: 18rem;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+  box-shadow: inset 0 -1px 0 var(--strong-line);
+  isolation: isolate;
+}
+
+.tag-reservoir::before {
+  position: absolute;
+  z-index: -1;
+  inset: 44% 0 0;
+  border-top: 1px solid color-mix(in srgb, var(--red) 28%, var(--line));
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--reservoir-water) 72%, transparent),
+    var(--reservoir-water)
+  );
+  box-shadow: 0 -14px 32px color-mix(in srgb, var(--red) 6%, transparent);
+  content: '';
+  pointer-events: none;
+  transition:
+    inset 1s var(--ease-out),
+    opacity 0.6s ease;
+}
+
+.topic-cloud {
+  display: flex;
+  min-height: 18rem;
+  margin: 0;
+  padding: 2rem;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+  align-content: flex-start;
+  list-style: none;
+}
+
+.topic-cloud a {
+  display: inline-flex;
+  height: fit-content;
+  color: var(--ink);
+  transition: transform 1s var(--ease-out);
+}
+
+.tag-bubble {
+  display: inline-flex;
+  gap: 0.9rem;
+  min-height: 2.85rem;
+  padding: 0.65rem 1rem;
+  align-items: center;
+  border: 1px solid color-mix(in srgb, var(--strong-line) 58%, transparent);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--surface) 88%, transparent);
+  box-shadow: 0 10px 28px color-mix(in srgb, var(--ink) 8%, transparent);
+  backdrop-filter: blur(10px);
+  font-size: 0.86rem;
+  font-weight: 550;
+  animation: tag-bob 3.2s ease-in-out var(--float-delay) infinite alternate;
+  transition:
+    border-color 0.25s ease,
+    background-color 0.25s ease,
+    box-shadow 0.25s ease;
+}
+
+.tag-bubble small {
+  color: var(--muted);
+  font-size: 0.75rem;
+}
+
+.topic-cloud a:hover .tag-bubble,
+.topic-cloud a:focus-visible .tag-bubble {
+  border-color: var(--red);
+  background: var(--surface);
+  box-shadow: 0 14px 34px color-mix(in srgb, var(--red) 12%, transparent);
+}
+
+@keyframes tag-bob {
+  from {
+    transform: translateY(-3px);
+  }
+
+  to {
+    transform: translateY(4px);
+  }
+}
+
+@media (pointer: fine), (pointer: none) {
+  .topic-cloud a {
+    transform: translate(var(--sink-x), var(--sink-y))
+      rotate(var(--sink-rotate));
+  }
+
+  .tag-reservoir:hover .topic-cloud a,
+  .tag-reservoir:focus-within .topic-cloud a {
+    transform: translate(0, 0) rotate(0);
+  }
+
+  .tag-reservoir:hover::before,
+  .tag-reservoir:focus-within::before {
+    inset: 72% 0 0;
+    opacity: 0.72;
+  }
+}
+
+@media (max-width: 640px) {
+  .tag-reservoir,
+  .topic-cloud {
+    min-height: 15rem;
+  }
+
+  .topic-cloud {
+    padding: 1rem;
+  }
+
+  .topic-cloud a {
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .topic-cloud a {
+    transform: none;
+  }
+
+  .tag-bubble {
+    animation: none;
+  }
+}

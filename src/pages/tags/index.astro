@@ -1,0 +1,31 @@
+---
+import EmptyState from '../../components/EmptyState.astro';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getAllTags, getPosts } from '../../lib/posts';
+
+const tags = getAllTags(await getPosts());
+---
+
+<BaseLayout title="标签" description="按主题浏览 CD233 Blog 的文章。">
+  <header class="page-hero page-container">
+    <h1>标签</h1>
+    <p>按关键词浏览。</p>
+  </header>
+
+  <section class="listing-section page-container">
+    {
+      tags.length > 0 ? (
+        <div class="tag-index">
+          {tags.map((tag) => (
+            <a href={`/tags/${tag.slug}/`}>
+              <span>#{tag.name}</span>
+              <small>{tag.count} 篇</small>
+            </a>
+          ))}
+        </div>
+      ) : (
+        <EmptyState title="标签会随着文章一起出现" />
+      )
+    }
+  </section>
+</BaseLayout>

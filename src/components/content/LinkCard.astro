@@ -1,0 +1,27 @@
+---
+import { ArrowUpRight } from '@lucide/astro';
+
+interface Props {
+  href: string;
+  title: string;
+  description?: string;
+  label?: string;
+}
+
+const { href, title, description, label = '外部链接' } = Astro.props;
+const host = (() => {
+  try {
+    return new URL(href).hostname.replace(/^www\./, '');
+  } catch {
+    return href;
+  }
+})();
+---
+
+<a class="link-card" href={href} target="_blank" rel="noreferrer">
+  <span class="link-card-label">{label}</span>
+  <strong>{title}</strong>
+  {description && <span>{description}</span>}
+  <small>{host}</small>
+  <ArrowUpRight class="link-card-arrow" size={18} aria-hidden="true" />
+</a>

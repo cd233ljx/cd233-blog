@@ -1,0 +1,6 @@
+dist
+.astro
+.pagefind
+node_modules
+package-lock.json
+public/pagefind

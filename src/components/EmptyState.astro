@@ -1,0 +1,17 @@
+---
+import { FileText } from '@lucide/astro';
+
+interface Props {
+  title?: string;
+  description?: string;
+}
+
+const { title = '还没有文章', description = '有新的记录时，会出现在这里。' } =
+  Astro.props;
+---
+
+<div class="empty-state">
+  <span class="empty-icon"><FileText size={22} aria-hidden="true" /></span>
+  <h2>{title}</h2>
+  <p>{description}</p>
+</div>

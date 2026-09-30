@@ -1,0 +1,111 @@
+---
+import { ClientRouter } from 'astro:transitions';
+
+import AmbientBackdrop from '../components/AmbientBackdrop.astro';
+import SiteFooter from '../components/SiteFooter.astro';
+import SiteHeader from '../components/SiteHeader.astro';
+import { SITE } from '../config/site';
+import '../styles/global.css';
+
+interface Props {
+  title?: string;
+  description?: string;
+  image?: string;
+  type?: 'website' | 'article';
+  noIndex?: boolean;
+}
+
+const {
+  title,
+  description = SITE.description,
+  image,
+  type = 'website',
+  noIndex = false,
+} = Astro.props;
+const pageTitle = title ? `${title} — ${SITE.title}` : SITE.title;
+const canonical = new URL(Astro.url.pathname, SITE.url);
+const socialImage = image ? new URL(image, SITE.url) : undefined;
+const websiteSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'WebSite',
+  name: SITE.title,
+  url: SITE.url,
+  description: SITE.description,
+  inLanguage: SITE.locale,
+  author: {
+    '@type': 'Person',
+    name: SITE.author,
+  },
+};
+---
+
+<!doctype html>
+<html lang={SITE.language} data-theme="light">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="generator" content={Astro.generator} />
+    <meta name="theme-color" content="#ffffff" />
+    <meta name="color-scheme" content="light dark" />
+    <title>{pageTitle}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    <link rel="manifest" href="/site.webmanifest" />
+    {noIndex && <meta name="robots" content="noindex, nofollow" />}
+
+    <meta property="og:type" content={type} />
+    <meta property="og:site_name" content={SITE.title} />
+    <meta property="og:title" content={pageTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:locale" content="zh_CN" />
+    {socialImage && <meta property="og:image" content={socialImage} />}
+
+    <meta
+      name="twitter:card"
+      content={socialImage ? 'summary_large_image' : 'summary'}
+    />
+    <meta name="twitter:title" content={pageTitle} />
+    <meta name="twitter:description" content={description} />
+    {socialImage && <meta name="twitter:image" content={socialImage} />}
+
+    <script
+      is:inline
+      type="application/ld+json"
+      set:html={JSON.stringify(websiteSchema)}
+    />
+    <script is:inline>
+      (() => {
+        const key = 'cd233-theme';
+        let stored;
+        try {
+          stored = localStorage.getItem(key);
+        } catch {
+          // Reading stays available when browser storage is disabled.
+        }
+        const systemDark = window.matchMedia(
+          '(prefers-color-scheme: dark)',
+        ).matches;
+        const theme =
+          stored === 'light' || stored === 'dark'
+            ? stored
+            : systemDark
+              ? 'dark'
+              : 'light';
+        document.documentElement.dataset.theme = theme;
+      })();
+    </script>
+    <ClientRouter fallback="animate" />
+  </head>
+  <body class="min-h-screen overflow-x-clip antialiased">
+    <AmbientBackdrop />
+    <a class="skip-link" href="#main-content">跳到正文</a>
+    <div class="site-shell">
+      <SiteHeader currentPath={Astro.url.pathname} />
+      <main id="main-content">
+        <slot />
+      </main>
+      <SiteFooter />
+    </div>
+  </body>
+</html>

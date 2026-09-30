@@ -1,0 +1,38 @@
+---
+import type { ImageMetadata } from 'astro';
+import { Image } from 'astro:assets';
+
+type GalleryItem = {
+  src: ImageMetadata;
+  alt: string;
+  caption?: string;
+};
+
+interface Props {
+  items: GalleryItem[];
+  columns?: 2 | 3;
+}
+
+const { items, columns = 2 } = Astro.props;
+---
+
+<figure class={`content-gallery gallery-columns-${columns}`}>
+  {
+    items.map((item) => (
+      <div class="gallery-item">
+        <Image
+          src={item.src}
+          alt={item.alt}
+          widths={[480, 720, 1080]}
+          sizes={
+            columns === 3
+              ? '(min-width: 900px) 30vw, 90vw'
+              : '(min-width: 900px) 44vw, 90vw'
+          }
+          loading="lazy"
+        />
+        {item.caption && <figcaption>{item.caption}</figcaption>}
+      </div>
+    ))
+  }
+</figure>

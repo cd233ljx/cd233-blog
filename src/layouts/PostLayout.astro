@@ -1,0 +1,155 @@
+---
+import { Image } from 'astro:assets';
+import { CalendarDays, Clock3, RefreshCcw } from '@lucide/astro';
+import 'katex/dist/katex.min.css';
+
+import PostList from '../components/PostList.astro';
+import ReadingProgress from '../components/ReadingProgress.astro';
+import SectionHeading from '../components/SectionHeading.astro';
+import TableOfContents from '../components/TableOfContents.astro';
+import { SITE } from '../config/site';
+import {
+  formatPostDate,
+  getReadingMinutes,
+  getRelatedPosts,
+  getTagHref,
+  type Post,
+} from '../lib/posts';
+import BaseLayout from './BaseLayout.astro';
+
+interface Heading {
+  depth: number;
+  slug: string;
+  text: string;
+}
+
+interface Props {
+  post: Post;
+  headings: Heading[];
+  allPosts: Post[];
+}
+
+const { post, headings, allPosts } = Astro.props;
+const relatedPosts = getRelatedPosts(post, allPosts);
+const canonical = new URL(`/posts/${post.id}/`, SITE.url);
+const articleSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'BlogPosting',
+  headline: post.data.title,
+  description: post.data.description,
+  datePublished: post.data.publishedAt.toISOString(),
+  dateModified: (post.data.updatedAt ?? post.data.publishedAt).toISOString(),
+  inLanguage: SITE.locale,
+  mainEntityOfPage: canonical.toString(),
+  author: {
+    '@type': 'Person',
+    name: SITE.author,
+  },
+  publisher: {
+    '@type': 'Person',
+    name: SITE.author,
+  },
+  keywords: post.data.tags.join(', '),
+};
+---
+
+<BaseLayout
+  title={post.data.title}
+  description={post.data.description}
+  type="article"
+  noIndex={post.data.draft}
+>
+  <ReadingProgress />
+
+  <article class="post-page" data-pagefind-body>
+    <header class="post-hero page-container">
+      <div class="post-hero-content">
+        {
+          post.data.draft && (
+            <div class="post-kicker">
+              <span class="draft-badge">开发草稿</span>
+            </div>
+          )
+        }
+        <h1
+          data-pagefind-meta="title"
+          transition:name={`post-title-${post.id}`}
+        >
+          {post.data.title}
+        </h1>
+        <p class="post-deck">{post.data.description}</p>
+        <div class="post-meta-row">
+          <span>
+            <CalendarDays size={15} aria-hidden="true" />
+            {formatPostDate(post.data.publishedAt)}
+          </span>
+          <span>
+            <Clock3 size={15} aria-hidden="true" />
+            约 {getReadingMinutes(post)} 分钟
+          </span>
+          {
+            post.data.updatedAt && (
+              <span>
+                <RefreshCcw size={14} aria-hidden="true" />
+                更新于 {formatPostDate(post.data.updatedAt)}
+              </span>
+            )
+          }
+        </div>
+      </div>
+    </header>
+
+    {
+      post.data.cover && (
+        <div class="post-cover page-container">
+          <Image
+            src={post.data.cover}
+            alt={post.data.coverAlt ?? ''}
+            widths={[720, 1080, 1440, 1920]}
+            sizes="(min-width: 720px) 656px, calc(100vw - 48px)"
+            loading="eager"
+          />
+        </div>
+      )
+    }
+
+    <div class="post-layout page-container">
+      <div class="post-aside" data-pagefind-ignore>
+        <TableOfContents headings={headings} />
+      </div>
+      <div class="post-content">
+        <div class="article-prose prose prose-lg max-w-none">
+          <slot />
+        </div>
+        <footer class="post-footer">
+          <div>
+            <p class="eyebrow">文章标签</p>
+            <div class="tag-list tag-list-large">
+              {
+                post.data.tags.map((tag) => (
+                  <a href={getTagHref(tag)}>#{tag}</a>
+                ))
+              }
+            </div>
+          </div>
+          <p>如果这篇记录恰好帮到你，也欢迎继续看看其他文章。</p>
+        </footer>
+      </div>
+    </div>
+  </article>
+
+  {
+    relatedPosts.length > 0 && (
+      <section class="related-section page-container">
+        <SectionHeading title="接着读" />
+        <PostList posts={relatedPosts} headingLevel="h3" />
+      </section>
+    )
+  }
+
+  <script
+    is:inline
+    type="application/ld+json"
+    set:html={JSON.stringify(articleSchema)}
+  />
+</BaseLayout>

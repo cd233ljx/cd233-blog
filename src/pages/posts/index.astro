@@ -1,0 +1,19 @@
+---
+import PostList from '../../components/PostList.astro';
+import EmptyState from '../../components/EmptyState.astro';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getPosts } from '../../lib/posts';
+
+const posts = await getPosts();
+---
+
+<BaseLayout title="全部文章" description="CD233 的技术笔记与日常杂谈。">
+  <header class="page-hero page-container">
+    <h1>全部文章</h1>
+    <p>写过的东西都在这里，新的在前面。</p>
+  </header>
+
+  <section class="listing-section page-container">
+    {posts.length > 0 ? <PostList posts={posts} /> : <EmptyState />}
+  </section>
+</BaseLayout>

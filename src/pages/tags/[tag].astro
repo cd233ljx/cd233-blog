@@ -1,0 +1,32 @@
+---
+import PostList from '../../components/PostList.astro';
+import EmptyState from '../../components/EmptyState.astro';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getAllTags, getPosts, slugifyTag } from '../../lib/posts';
+
+export async function getStaticPaths() {
+  const posts = await getPosts();
+  return getAllTags(posts).map((tag) => ({
+    params: { tag: tag.slug },
+    props: {
+      tag: tag.name,
+      posts: posts.filter((post) =>
+        post.data.tags.some((candidate) => slugifyTag(candidate) === tag.slug),
+      ),
+    },
+  }));
+}
+
+const { tag, posts } = Astro.props;
+---
+
+<BaseLayout title={`#${tag}`} description={`所有带有“${tag}”标签的文章。`}>
+  <header class="page-hero page-container">
+    <h1>#{tag}</h1>
+    <p>共 {posts.length} 篇相关记录。</p>
+  </header>
+
+  <section class="listing-section page-container">
+    {posts.length > 0 ? <PostList posts={posts} /> : <EmptyState />}
+  </section>
+</BaseLayout>

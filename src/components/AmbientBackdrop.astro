@@ -1,0 +1,237 @@
+<div class="ambient-backdrop" aria-hidden="true">
+  <canvas data-ambient-canvas></canvas>
+</div>
+
+<script>
+  /**
+   * Branch growth adapted from Anthony Fu's Plum (MIT).
+   * https://github.com/antfu/100/blob/main/src/pages/013.vue
+   * Copyright (c) 2020 Anthony Fu. License: /licenses/antfu-100-MIT.txt
+   * Native Canvas, two bounded branches, and a clear reading area.
+   */
+  const frameInterval = 1000 / 30;
+  const turningAngle = Math.PI / 12;
+  type Branch = { x: number; y: number; angle: number };
+  type Segment = {
+    x: number;
+    y: number;
+    nextX: number;
+    nextY: number;
+    opacity: number;
+  };
+  let activeCanvas: HTMLCanvasElement | undefined;
+  let cleanupBackdrop: (() => void) | undefined;
+
+  function initializeBackdrop() {
+    const canvas = document.querySelector<HTMLCanvasElement>(
+      '[data-ambient-canvas]',
+    );
+    if (canvas === activeCanvas) return;
+    cleanupBackdrop?.();
+    if (!canvas) return;
+    const context = canvas.getContext('2d');
+    if (!context) return;
+    activeCanvas = canvas;
+
+    const listeners = new AbortController();
+    const wideScreen = window.matchMedia('(min-width: 1100px)');
+    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+    let width = 0;
+    let height = 0;
+    let inkColor = '';
+    let inkOpacity = 0;
+    let frames: Segment[][] = [];
+    let renderedFrames = 0;
+    let lastPaint = 0;
+    let animationFrame = 0;
+    let resizeTimer = 0;
+
+    const stopAnimation = () => {
+      cancelAnimationFrame(animationFrame);
+      animationFrame = 0;
+    };
+
+    const readTheme = () => {
+      const style = getComputedStyle(document.documentElement);
+      inkColor = style.getPropertyValue('--ambient-ink').trim();
+      inkOpacity = Number.parseFloat(
+        style.getPropertyValue('--ambient-opacity'),
+      );
+    };
+
+    const drawFrame = (segments: Segment[]) => {
+      context.strokeStyle = inkColor;
+      context.lineWidth = 0.9;
+      context.lineCap = 'round';
+      for (const segment of segments) {
+        context.globalAlpha = segment.opacity * inkOpacity;
+        context.beginPath();
+        context.moveTo(segment.x, segment.y);
+        context.lineTo(segment.nextX, segment.nextY);
+        context.stroke();
+      }
+      context.globalAlpha = 1;
+    };
+
+    const redraw = () => {
+      context.clearRect(0, 0, width, height);
+      for (let index = 0; index < renderedFrames; index++)
+        drawFrame(frames[index]);
+    };
+
+    const drawRemaining = () => {
+      while (renderedFrames < frames.length)
+        drawFrame(frames[renderedFrames++]);
+    };
+
+    const animate = (now: number) => {
+      if (now - lastPaint >= frameInterval) {
+        drawFrame(frames[renderedFrames++]);
+        lastPaint = now;
+      }
+      if (renderedFrames < frames.length)
+        animationFrame = requestAnimationFrame(animate);
+      else animationFrame = 0;
+    };
+
+    const updateAnimation = () => {
+      stopAnimation();
+      if (document.hidden || !frames.length) return;
+      if (reducedMotion.matches) drawRemaining();
+      else if (renderedFrames < frames.length) {
+        lastPaint = performance.now();
+        animationFrame = requestAnimationFrame(animate);
+      }
+    };
+
+    const growBranch = (left: number, right: number, fromLeft: boolean) => {
+      const rootY =
+        height * ((fromLeft ? 0.28 : 0.7) + (Math.random() - 0.5) * 0.08);
+      let branches: Branch[] = [
+        {
+          x: fromLeft ? left : right,
+          y: rootY,
+          angle: fromLeft ? -Math.PI / 18 : Math.PI + Math.PI / 18,
+        },
+      ];
+      let segmentCount = 0;
+      for (
+        let generation = 0;
+        generation < 96 && branches.length;
+        generation++
+      ) {
+        const nextBranches: Branch[] = [];
+        const segments: Segment[] = [];
+        for (const branch of branches) {
+          if (segmentCount >= 1600) break;
+          const length = 2 + Math.random() * 6;
+          const nextX = branch.x + Math.cos(branch.angle) * length;
+          const nextY = branch.y + Math.sin(branch.angle) * length;
+          // Stop before the reading boundary, including the whole line segment.
+          if (
+            nextX < left ||
+            nextX > right ||
+            nextY < 64 ||
+            nextY > height - 48
+          )
+            continue;
+          const innerDistance = fromLeft
+            ? right - Math.max(branch.x, nextX)
+            : Math.min(branch.x, nextX) - left;
+          const opacity = Math.max(
+            0,
+            Math.min(
+              1,
+              innerDistance / 100,
+              (nextY - 64) / 80,
+              (height - 48 - nextY) / 80,
+            ),
+          );
+          segments.push({ x: branch.x, y: branch.y, nextX, nextY, opacity });
+          segmentCount++;
+          // Plum guarantees the first five splits, then each fork has a 50% chance.
+          const rate = generation < 5 ? 1 : generation < 48 ? 0.5 : 0.44;
+          for (const direction of [1, -1]) {
+            if (Math.random() < rate)
+              nextBranches.push({
+                x: nextX,
+                y: nextY,
+                angle: branch.angle + direction * Math.random() * turningAngle,
+              });
+          }
+        }
+        (frames[generation] ??= []).push(...segments);
+        branches = nextBranches;
+        if (segmentCount >= 1600) break;
+      }
+    };
+
+    const resizeScene = () => {
+      stopAnimation();
+      frames = [];
+      renderedFrames = 0;
+      canvas.width = 0;
+      canvas.height = 0;
+      if (!wideScreen.matches) return;
+      const readingArea = document
+        .querySelector('#main-content .page-container')
+        ?.getBoundingClientRect();
+      if (!readingArea) return;
+      width = document.documentElement.clientWidth;
+      height = window.innerHeight;
+      const density = Math.min(window.devicePixelRatio || 1, 2);
+      canvas.width = Math.round(width * density);
+      canvas.height = Math.round(height * density);
+      context.setTransform(density, 0, 0, density, 0, 0);
+      const toc = document.querySelector('.toc-panel')?.getBoundingClientRect();
+      const leftBoundary = readingArea.left - 64;
+      const rightBoundary = Math.max(readingArea.right, toc?.right || 0) + 64;
+      if (leftBoundary > 80) growBranch(0, leftBoundary, true);
+      if (width - rightBoundary > 80) growBranch(rightBoundary, width, false);
+      readTheme();
+      // Give the growing branches a visible starting point without an empty first frame.
+      for (let index = 0; index < Math.min(12, frames.length); index++)
+        drawFrame(frames[renderedFrames++]);
+      updateAnimation();
+    };
+
+    window.addEventListener(
+      'resize',
+      () => {
+        stopAnimation();
+        clearTimeout(resizeTimer);
+        resizeTimer = window.setTimeout(resizeScene, 120);
+      },
+      { signal: listeners.signal },
+    );
+    window.addEventListener(
+      'themechange',
+      () => {
+        readTheme();
+        redraw();
+      },
+      { signal: listeners.signal },
+    );
+    document.addEventListener('visibilitychange', updateAnimation, {
+      signal: listeners.signal,
+    });
+    reducedMotion.addEventListener('change', updateAnimation, {
+      signal: listeners.signal,
+    });
+
+    cleanupBackdrop = () => {
+      stopAnimation();
+      clearTimeout(resizeTimer);
+      listeners.abort();
+      frames = [];
+      canvas.width = 0;
+      canvas.height = 0;
+      activeCanvas = undefined;
+    };
+    resizeScene();
+  }
+
+  document.addEventListener('astro:before-swap', () => cleanupBackdrop?.());
+  document.addEventListener('astro:page-load', initializeBackdrop);
+  initializeBackdrop();
+</script>

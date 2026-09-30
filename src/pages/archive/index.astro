@@ -1,0 +1,125 @@
+---
+import { ArrowUpRight, ChevronDown } from '@lucide/astro';
+
+import EmptyState from '../../components/EmptyState.astro';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getPostHref, getPosts, type Post } from '../../lib/posts';
+
+const posts = await getPosts();
+const dateFormatter = new Intl.DateTimeFormat('en-CA', {
+  timeZone: 'Asia/Shanghai',
+  year: 'numeric',
+  month: '2-digit',
+  day: '2-digit',
+});
+const weekdayFormatter = new Intl.DateTimeFormat('zh-CN', {
+  timeZone: 'Asia/Shanghai',
+  weekday: 'short',
+});
+
+type ArchiveDay = {
+  key: string;
+  monthDay: string;
+  weekday: string;
+  posts: Post[];
+};
+
+const yearMaps = new Map<number, Map<string, ArchiveDay>>();
+
+for (const post of posts) {
+  const parts = Object.fromEntries(
+    dateFormatter
+      .formatToParts(post.data.publishedAt)
+      .filter(({ type }) => type !== 'literal')
+      .map(({ type, value }) => [type, value]),
+  );
+  const year = Number(parts.year);
+  const key = `${parts.year}-${parts.month}-${parts.day}`;
+  const days = yearMaps.get(year) ?? new Map<string, ArchiveDay>();
+  const day = days.get(key) ?? {
+    key,
+    monthDay: `${parts.month}.${parts.day}`,
+    weekday: weekdayFormatter.format(post.data.publishedAt),
+    posts: [],
+  };
+
+  day.posts.push(post);
+  days.set(key, day);
+  yearMaps.set(year, days);
+}
+
+const groupedYears = [...yearMaps.entries()].map(([year, days]) => ({
+  year,
+  days: [...days.values()],
+  postCount: [...days.values()].reduce(
+    (count, day) => count + day.posts.length,
+    0,
+  ),
+}));
+---
+
+<BaseLayout title="归档" description="按时间回看 CD233 Blog 的全部记录。">
+  <header class="page-hero page-container archive-hero">
+    <h1 class="archive-heading">归档</h1>
+    <p>按时间浏览。</p>
+  </header>
+
+  <section class="listing-section page-container">
+    {
+      groupedYears.length > 0 ? (
+        <div class="archive-list">
+          {groupedYears.map(({ year, days, postCount }) => (
+            <section class="archive-year">
+              <div class="archive-year-label">
+                <span>{year}</span>
+                <small>{postCount} 篇文章</small>
+              </div>
+              <div class="archive-timeline">
+                {days.map((day) => (
+                  <div class="archive-day">
+                    <time class="archive-date" datetime={day.key}>
+                      <strong>{day.monthDay}</strong>
+                      <small>{day.weekday}</small>
+                    </time>
+                    {day.posts.length > 1 ? (
+                      <details class="archive-day-details">
+                        <summary class="archive-day-summary">
+                          <span>
+                            <strong>{day.posts.length} 篇文章</strong>
+                            <small>展开当天记录</small>
+                          </span>
+                          <ChevronDown size={17} aria-hidden="true" />
+                        </summary>
+                        <div class="archive-day-posts">
+                          {day.posts.map((post) => (
+                            <a href={getPostHref(post)} class="archive-item">
+                              <span class="archive-title">
+                                {post.data.title}
+                              </span>
+                              <ArrowUpRight size={16} aria-hidden="true" />
+                            </a>
+                          ))}
+                        </div>
+                      </details>
+                    ) : (
+                      <div class="archive-day-posts">
+                        {day.posts.map((post) => (
+                          <a href={getPostHref(post)} class="archive-item">
+                            <span class="archive-title">{post.data.title}</span>
+                            <ArrowUpRight size={16} aria-hidden="true" />
+                          </a>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </section>
+          ))}
+        </div>
+      ) : (
+        <EmptyState />
+      )
+    }
+  </section>
+</BaseLayout>

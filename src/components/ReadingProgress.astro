@@ -1,0 +1,41 @@
+<div class="reading-progress" data-reading-progress aria-hidden="true"></div>
+
+<script>
+  let cleanup: (() => void) | undefined;
+
+  function bindReadingProgress() {
+    cleanup?.();
+    const progress = document.querySelector<HTMLElement>(
+      '[data-reading-progress]',
+    );
+    if (!progress) return;
+
+    const controller = new AbortController();
+    let frame = 0;
+    const update = () => {
+      frame = 0;
+      const max = document.documentElement.scrollHeight - window.innerHeight;
+      const value =
+        max > 0 ? Math.min(1, Math.max(0, window.scrollY / max)) : 0;
+      progress.style.transform = `scaleX(${value})`;
+    };
+    const schedule = () => {
+      if (!frame) frame = requestAnimationFrame(update);
+    };
+
+    window.addEventListener('scroll', schedule, {
+      passive: true,
+      signal: controller.signal,
+    });
+    window.addEventListener('resize', schedule, { signal: controller.signal });
+    update();
+    cleanup = () => {
+      controller.abort();
+      cancelAnimationFrame(frame);
+    };
+  }
+
+  document.addEventListener('astro:before-swap', () => cleanup?.());
+  document.addEventListener('astro:page-load', bindReadingProgress);
+  bindReadingProgress();
+</script>

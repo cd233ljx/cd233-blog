@@ -1,0 +1,25 @@
+@import '@fontsource-variable/noto-serif-sc';
+@import './tailwind.css';
+@import './tokens.css';
+@import './shell.css';
+@import './home.css';
+@import './pages.css';
+@import './content.css';
+@import './responsive.css';
+@import './theme.css';
+@import './typography.css';
+
+/*
+ * Style map:
+ * - tokens.css: design tokens, reset, buttons, and shared primitives
+ * - shell.css: header and global navigation
+ * - home.css: author introduction, shared post list, and tags
+ * - pages.css: listing, archive, about, search, 404, and footer
+ * - content.css: post layout and rich-content components
+ * - responsive.css: baseline responsive behavior
+ * - theme.css: light/dark colors and the tag pool animation
+ * - typography.css: self-hosted Inter and heading/quote typography
+ *
+ * Preserve this import order. Update the existing theme instead of appending a
+ * new full-site override layer.
+ */

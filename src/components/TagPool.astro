@@ -1,0 +1,40 @@
+---
+import type { getAllTags } from '../lib/posts';
+
+interface Props {
+  tags: ReturnType<typeof getAllTags>;
+}
+
+const { tags } = Astro.props;
+const sinkOffsets = [
+  { x: -8, y: 116, rotate: -7, delay: -0.4 },
+  { x: -2, y: 132, rotate: 5, delay: -1.8 },
+  { x: 5, y: 104, rotate: -3, delay: -2.6 },
+  { x: 10, y: 138, rotate: 8, delay: -1.1 },
+  { x: -5, y: 122, rotate: -5, delay: -3.2 },
+  { x: 4, y: 146, rotate: 4, delay: -2.1 },
+];
+---
+
+<div class="tag-reservoir" role="group" aria-label="标签蓄水池">
+  <ul class="topic-cloud" aria-label="文章标签">
+    {
+      tags.map((tag, index) => {
+        const offset = sinkOffsets[index % sinkOffsets.length];
+        return (
+          <li>
+            <a
+              href={`/tags/${tag.slug}/`}
+              style={`--sink-x: ${offset.x}px; --sink-y: ${offset.y}px; --sink-rotate: ${offset.rotate}deg; --float-delay: ${offset.delay}s;`}
+            >
+              <span class="tag-bubble">
+                <span>#{tag.name}</span>
+                <small>{tag.count} 篇</small>
+              </span>
+            </a>
+          </li>
+        );
+      })
+    }
+  </ul>
+</div>

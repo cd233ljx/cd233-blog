@@ -1,0 +1,157 @@
+---
+import { Menu, Search, X } from '@lucide/astro';
+
+import { NAV_ITEMS, SITE } from '../config/site';
+import ThemeToggle from './ThemeToggle.astro';
+
+interface Props {
+  currentPath: string;
+}
+
+const { currentPath } = Astro.props;
+const isActive = (href: string) =>
+  href === '/' ? currentPath === href : currentPath.startsWith(href);
+---
+
+<header class="site-header" data-site-header>
+  <div class="header-inner">
+    <a
+      href="/"
+      class="brand-mark"
+      aria-label={`${SITE.title} 首页`}
+      transition:name="site-brand"
+    >
+      <span class="brand-glyph">{SITE.name}</span>
+    </a>
+
+    <nav class="desktop-nav" aria-label="主导航">
+      {
+        NAV_ITEMS.map((item) => (
+          <a
+            class:list={['nav-link', { active: isActive(item.href) }]}
+            href={item.href}
+            aria-current={isActive(item.href) ? 'page' : undefined}
+          >
+            {item.label}
+          </a>
+        ))
+      }
+    </nav>
+
+    <div class="header-actions">
+      <a class="icon-button" href="/search/" aria-label="搜索文章" title="搜索">
+        <Search size={17} stroke-width={1.8} aria-hidden="true" />
+        <span class="shortcut-hint">⌘K</span>
+      </a>
+      <ThemeToggle />
+      <button
+        class="icon-button mobile-menu-button"
+        type="button"
+        aria-label="打开导航菜单"
+        aria-expanded="false"
+        aria-controls="mobile-nav"
+        data-menu-toggle
+      >
+        <Menu class="menu-open-icon" size={18} aria-hidden="true" />
+        <X class="menu-close-icon" size={18} aria-hidden="true" />
+      </button>
+    </div>
+  </div>
+
+  <nav
+    id="mobile-nav"
+    class="mobile-nav"
+    aria-label="移动端导航"
+    aria-hidden="true"
+    inert
+    data-mobile-nav
+  >
+    {
+      NAV_ITEMS.map((item) => (
+        <a
+          class:list={['mobile-nav-link', { active: isActive(item.href) }]}
+          href={item.href}
+          aria-current={isActive(item.href) ? 'page' : undefined}
+        >
+          {item.label}
+        </a>
+      ))
+    }
+    <a class="mobile-nav-link" href="/search/">搜索</a>
+  </nav>
+</header>
+
+<script>
+  let headerBindings: AbortController | undefined;
+
+  function bindHeader() {
+    headerBindings?.abort();
+    const header = document.querySelector<HTMLElement>('[data-site-header]');
+    const toggle =
+      header?.querySelector<HTMLButtonElement>('[data-menu-toggle]');
+    const nav = header?.querySelector<HTMLElement>('[data-mobile-nav]');
+    if (!header || !toggle || !nav) return;
+
+    headerBindings = new AbortController();
+    const { signal } = headerBindings;
+    const setOpen = (open: boolean) => {
+      header.dataset.menuOpen = String(open);
+      toggle.setAttribute('aria-expanded', String(open));
+      toggle.setAttribute('aria-label', open ? '关闭导航菜单' : '打开导航菜单');
+      nav.inert = !open;
+      nav.setAttribute('aria-hidden', String(!open));
+    };
+    setOpen(false);
+
+    toggle.addEventListener(
+      'click',
+      () => setOpen(toggle.getAttribute('aria-expanded') !== 'true'),
+      { signal },
+    );
+    nav.querySelectorAll('a').forEach((link) => {
+      link.addEventListener('click', () => setOpen(false), { signal });
+    });
+    document.addEventListener(
+      'keydown',
+      (event) => {
+        if (
+          event.key === 'Escape' &&
+          toggle.getAttribute('aria-expanded') === 'true'
+        ) {
+          setOpen(false);
+          toggle.focus();
+        }
+      },
+      { signal },
+    );
+    document.addEventListener(
+      'pointerdown',
+      (event) => {
+        if (event.target instanceof Node && !header.contains(event.target))
+          setOpen(false);
+      },
+      { signal },
+    );
+    window
+      .matchMedia('(min-width: 821px)')
+      .addEventListener('change', () => setOpen(false), { signal });
+  }
+
+  function bindSearchShortcut() {
+    if (document.documentElement.dataset.searchShortcutBound === 'true') return;
+    document.documentElement.dataset.searchShortcutBound = 'true';
+    document.addEventListener('keydown', (event) => {
+      const target = event.target as HTMLElement | null;
+      if (target?.matches('input, textarea, [contenteditable="true"]')) return;
+      if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'k') {
+        event.preventDefault();
+        window.location.href = '/search/';
+      }
+    });
+  }
+
+  document.addEventListener('astro:before-swap', () => headerBindings?.abort());
+  document.addEventListener('astro:page-load', bindHeader);
+  bindHeader();
+  bindSearchShortcut();
+</script>

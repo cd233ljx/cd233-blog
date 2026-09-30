@@ -1,0 +1,22 @@
+---
+import { AudioLines } from '@lucide/astro';
+
+interface Props {
+  src: string;
+  title: string;
+  description?: string;
+}
+
+const { src, title, description } = Astro.props;
+---
+
+<figure class="audio-player">
+  <span class="audio-icon"><AudioLines size={20} aria-hidden="true" /></span>
+  <figcaption>
+    <strong>{title}</strong>
+    {description && <span>{description}</span>}
+  </figcaption>
+  <audio controls preload="metadata" src={src}>
+    你的浏览器不支持音频播放。
+  </audio>
+</figure>

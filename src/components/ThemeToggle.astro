@@ -1,0 +1,68 @@
+---
+import { Moon, Sun } from '@lucide/astro';
+---
+
+<button
+  class="icon-button group"
+  type="button"
+  aria-label="切换浅色或深色主题"
+  title="切换主题"
+  data-theme-toggle
+>
+  <Sun
+    class="theme-icon theme-icon-sun"
+    size={17}
+    stroke-width={1.8}
+    aria-hidden="true"
+  />
+  <Moon
+    class="theme-icon theme-icon-moon"
+    size={17}
+    stroke-width={1.8}
+    aria-hidden="true"
+  />
+</button>
+
+<script>
+  const storageKey = 'cd233-theme';
+
+  function updateThemeButton() {
+    const button = document.querySelector<HTMLButtonElement>(
+      '[data-theme-toggle]',
+    );
+    if (!button) return;
+    const isDark = document.documentElement.dataset.theme === 'dark';
+    const themeColor = getComputedStyle(document.documentElement)
+      .getPropertyValue('--paper')
+      .trim();
+    document
+      .querySelector('meta[name="theme-color"]')
+      ?.setAttribute('content', themeColor);
+    button.setAttribute(
+      'aria-label',
+      isDark ? '切换到浅色主题' : '切换到深色主题',
+    );
+
+    if (button.dataset.bound === 'true') return;
+    button.dataset.bound = 'true';
+    button.addEventListener('click', () => {
+      const next =
+        document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
+      document.documentElement.dataset.theme = next;
+      try {
+        localStorage.setItem(storageKey, next);
+      } catch {
+        // The current page can still change theme without persistent storage.
+      }
+      window.dispatchEvent(new CustomEvent('themechange', { detail: next }));
+      updateThemeButton();
+    });
+  }
+
+  document.addEventListener('astro:before-swap', (event) => {
+    event.newDocument.documentElement.dataset.theme =
+      document.documentElement.dataset.theme;
+  });
+  document.addEventListener('astro:page-load', updateThemeButton);
+  updateThemeButton();
+</script>

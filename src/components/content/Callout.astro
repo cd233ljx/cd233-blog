@@ -1,0 +1,25 @@
+---
+import { CircleAlert, Info, Lightbulb, TriangleAlert } from '@lucide/astro';
+
+interface Props {
+  type?: 'note' | 'tip' | 'warning' | 'danger';
+  title?: string;
+}
+
+const { type = 'note', title } = Astro.props;
+const defaults = {
+  note: { title: '补充说明', Icon: Info },
+  tip: { title: '小提示', Icon: Lightbulb },
+  warning: { title: '请注意', Icon: TriangleAlert },
+  danger: { title: '风险提示', Icon: CircleAlert },
+};
+const { title: defaultTitle, Icon } = defaults[type];
+---
+
+<aside class={`content-callout callout-${type}`}>
+  <div class="callout-icon"><Icon size={18} aria-hidden="true" /></div>
+  <div>
+    <p class="callout-title">{title ?? defaultTitle}</p>
+    <div class="callout-body"><slot /></div>
+  </div>
+</aside>
