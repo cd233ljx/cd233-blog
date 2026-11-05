@@ -1,13 +1,17 @@
 ---
+import { CONTENT } from '../../config/site';
 import { Search } from '@lucide/astro';
 
 import BaseLayout from '../../layouts/BaseLayout.astro';
 ---
 
-<BaseLayout title="搜索" description="搜索 CD233 Blog 的全部已发布内容。">
+<BaseLayout
+  title={CONTENT.search.title}
+  description={CONTENT.search.description}
+>
   <header class="page-hero search-hero page-container">
-    <h1>搜索</h1>
-    <p>搜索标题与正文。</p>
+    <h1>{CONTENT.search.title}</h1>
+    <p>{CONTENT.search.intro}</p>
   </header>
 
   <section class="search-section page-container">
@@ -17,18 +21,23 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
       <input
         id="site-search"
         type="search"
-        placeholder="搜索技术、工具或某个想法…"
+        placeholder={CONTENT.search.placeholder}
         autocomplete="off"
         data-search-input
       />
       <kbd>ESC</kbd>
     </div>
-    <p class="search-status" data-search-status aria-live="polite">
-      输入至少两个字符开始搜索。
+    <p
+      class="search-status"
+      data-search-status
+      aria-live="polite"
+      data-copy={JSON.stringify(CONTENT.search)}
+    >
+      {CONTENT.search.idle}
     </p>
     <div class="search-results" data-search-results></div>
     <noscript>
-      搜索需要启用 JavaScript，也可以直接浏览<a href="/posts/">全部文章</a>。
+      {CONTENT.search.noscript}<a href="/posts/">{CONTENT.search.browse}</a>。
     </noscript>
   </section>
 </BaseLayout>
@@ -70,6 +79,12 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
     );
     const status = document.querySelector<HTMLElement>('[data-search-status]');
     if (!input || !results || !status) return;
+    const copy = JSON.parse(status.dataset.copy ?? '{}') as Record<
+      string,
+      string
+    >;
+    const countMessage = (template: string, count: number) =>
+      template.replaceAll('{count}', String(count));
 
     const controller = new AbortController();
     let timer = 0;
@@ -78,7 +93,7 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
       queryVersion++;
       window.clearTimeout(timer);
       results.replaceChildren();
-      status.textContent = '输入至少两个字符开始搜索。';
+      status.textContent = copy.idle;
     };
 
     const runSearch = async () => {
@@ -86,13 +101,13 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
       const query = input.value.trim();
       results.replaceChildren();
       if (query.length < 2) {
-        status.textContent = '输入至少两个字符开始搜索。';
+        status.textContent = copy.idle;
         return;
       }
 
       const isCurrent = () =>
         version === queryVersion && !controller.signal.aborted;
-      status.textContent = '正在搜索…';
+      status.textContent = copy.loading;
       try {
         const pagefind = await loadPagefind();
         if (!pagefind || !isCurrent()) return;
@@ -106,10 +121,10 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
         const total = response.results.length;
         status.textContent =
           total > 20
-            ? `找到 ${total} 条结果，显示前 20 条。`
+            ? countMessage(copy.manyResults, total)
             : total > 0
-              ? `找到 ${total} 条结果`
-              : '没有找到相关内容。';
+              ? countMessage(copy.results, total)
+              : copy.empty;
         const fragment = document.createDocumentFragment();
         items.forEach((item) => {
           const article = document.createElement('article');
@@ -117,7 +132,7 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
           const link = document.createElement('a');
           link.href = item.url;
           const title = document.createElement('h2');
-          title.textContent = item.meta.title ?? '未命名文章';
+          title.textContent = item.meta.title ?? copy.untitled;
           const excerpt = document.createElement('p');
           // Excerpts come from this site's build-time Pagefind index.
           excerpt.innerHTML = item.excerpt;
@@ -128,7 +143,7 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
         results.append(fragment);
       } catch {
         if (isCurrent()) {
-          status.textContent = '搜索暂时不可用，请先从文章页浏览。';
+          status.textContent = copy.error;
         }
       }
     };

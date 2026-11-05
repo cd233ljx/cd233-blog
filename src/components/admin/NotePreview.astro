@@ -1,0 +1,54 @@
+---
+import { getEntry, render } from 'astro:content';
+import * as components from '../content';
+import 'katex/dist/katex.min.css';
+import '../../styles/global.css';
+
+const post = await getEntry('posts', Astro.params.slug || '');
+if (!post)
+  return new Response('笔记不存在，可能已在仓库中移动或删除。', {
+    status: 404,
+  });
+const { Content } = await render(post);
+---
+
+<!doctype html>
+<html
+  lang="zh-CN"
+  data-theme={Astro.url.searchParams.get('theme') === 'dark' ? 'dark' : 'light'}
+>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>{post.data.title}</title>
+  </head>
+  <body data-components-only={Astro.url.searchParams.get('components') === '1'}>
+    <main class="note-preview prose article-prose">
+      <Content components={components} />
+    </main>
+  </body>
+  <script>
+    if (document.body.dataset.componentsOnly === 'true') {
+      const main = document.querySelector('main')!;
+      const components = Array.from(
+        main.querySelectorAll('[data-preview-component]'),
+      );
+      main.replaceChildren(...components);
+      document.body.dataset.componentsReady = 'true';
+    }
+  </script>
+</html>
+<style>
+  .note-preview {
+    max-width: 48rem;
+    padding: 1.5rem;
+    margin: 0 auto;
+  }
+  body[data-components-only='true']:not([data-components-ready='true']) main {
+    visibility: hidden;
+  }
+  body {
+    min-width: 0;
+  }
+</style>

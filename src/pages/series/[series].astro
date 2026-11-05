@@ -1,0 +1,28 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import SeriesContents from '../../components/SeriesContents.astro';
+import { getSeries } from '../../lib/series';
+
+export async function getStaticPaths() {
+  return (await getSeries()).map((entry) => ({
+    params: { series: entry.id },
+    props: { entry },
+  }));
+}
+const { entry } = Astro.props;
+---
+
+<BaseLayout
+  title={entry.data.title}
+  description={entry.data.description}
+  noIndex={import.meta.env.DEV}
+>
+  <header class="page-hero page-container">
+    <a class="series-back" href="/series/">全部系列</a>
+    <h1>{entry.data.title}</h1>
+    <p class="series-count">{entry.posts.length} 篇</p>
+  </header>
+  <section class="listing-section page-container" aria-label="系列目录">
+    <SeriesContents series={entry.id} writing={import.meta.env.DEV} />
+  </section>
+</BaseLayout>

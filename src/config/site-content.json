@@ -1,0 +1,146 @@
+{
+  "identity": {
+    "name": "CD233",
+    "title": "CD233 Blog",
+    "author": "utopiacd",
+    "description": "记录技术实践、学习笔记和日常杂谈。",
+    "tagline": "技术笔记和日常杂谈，留着以后翻。",
+    "icon": "/favicon.ico",
+    "shareImage": "",
+    "email": "",
+    "github": "",
+    "x": "",
+    "bilibili": ""
+  },
+  "home": {
+    "title": "CD233",
+    "caption": "cd233的个人博客~",
+    "intro": "你好！我是CD233我的ID一般就是这个或者utopaicd~\n\n欢迎来到我的Blog！\n\n我会在这里分享一些我的折腾经历或者一些别的东西（？\n\n应该只有我自己会看我就随便写啦~",
+    "recentTitle": "最近的文章",
+    "recentLink": "全部文章",
+    "recentCount": 4,
+    "showRecent": true,
+    "tagsTitle": "按标签浏览",
+    "tagsLink": "全部标签",
+    "tagCount": 6,
+    "showTags": true,
+    "showBackdrop": true
+  },
+  "about": {
+    "pageTitle": "关于",
+    "description": "关于 CD233 和这个博客。",
+    "heading": "你好，我是 CD233。",
+    "lead": "这是我的个人博客，用来放技术笔记和日常杂谈。  \n有些问题想明白了就写下来，有些还在慢慢琢磨。",
+    "body": "## 这里写些什么\n\n开发中碰到的问题、试过的工具、学习时留下的笔记，还有技术之外的零碎想法。写下来，方便自己回头查，也希望能对路过的人有用。\n\n## 从哪里开始\n\n新来的话，可以先翻翻[全部文章](/posts/)。想按时间找旧记录，可以看[归档](/archive/)；想找某个话题，可以从[标签](/tags/)或[搜索](/search/)开始。"
+  },
+  "navigation": {
+    "items": [
+      {
+        "label": "文章",
+        "href": "/posts/"
+      },
+      {
+        "label": "系列",
+        "href": "/series/"
+      },
+      {
+        "label": "归档",
+        "href": "/archive/"
+      },
+      {
+        "label": "关于",
+        "href": "/about/"
+      }
+    ],
+    "search": "搜索",
+    "theme": "切换主题",
+    "skip": "跳到正文",
+    "emptyTitle": "还没有文章",
+    "emptyDescription": "有新的记录时，会出现在这里。",
+    "articleCount": "{count} 篇文章",
+    "shortCount": "{count} 篇"
+  },
+  "footer": {
+    "brand": "CD233",
+    "copyright": "© {year} {author}",
+    "note": "",
+    "links": [
+      {
+        "label": "文章",
+        "href": "/posts/"
+      },
+      {
+        "label": "归档",
+        "href": "/archive/"
+      },
+      {
+        "label": "关于",
+        "href": "/about/"
+      }
+    ],
+    "showSocial": true
+  },
+  "posts": {
+    "title": "全部文章",
+    "description": "CD233 的技术笔记与日常杂谈。",
+    "intro": "写过的东西都在这里，新的在前面。"
+  },
+  "archive": {
+    "title": "归档",
+    "description": "按时间回看 CD233 Blog 的全部记录。",
+    "intro": "按时间浏览。",
+    "expand": "展开当天记录"
+  },
+  "series": {
+    "title": "系列",
+    "description": "按主题和章节顺序，阅读持续整理的文章。",
+    "intro": "把有关联的记录放在一起，慢慢写，也可以按顺序读。",
+    "empty": "还没有公开的系列。"
+  },
+  "tags": {
+    "title": "标签",
+    "description": "按主题浏览 CD233 Blog 的文章。",
+    "intro": "按关键词浏览。",
+    "empty": "标签会随着文章一起出现",
+    "detailDescription": "所有带有“{tag}”标签的文章。",
+    "detailIntro": "共 {count} 篇相关记录。"
+  },
+  "search": {
+    "title": "搜索",
+    "description": "搜索 CD233 Blog 的全部已发布内容。",
+    "intro": "搜索标题与正文。",
+    "placeholder": "搜索技术、工具或某个想法…",
+    "idle": "输入至少两个字符开始搜索。",
+    "loading": "正在搜索…",
+    "results": "找到 {count} 条结果",
+    "manyResults": "找到 {count} 条结果，显示前 20 条。",
+    "empty": "没有找到相关内容。",
+    "error": "搜索暂时不可用，请先从文章页浏览。",
+    "untitled": "未命名文章",
+    "noscript": "搜索需要启用 JavaScript，也可以直接浏览",
+    "browse": "全部文章"
+  },
+  "article": {
+    "toc": "本文目录",
+    "tags": "文章标签",
+    "footer": "如果这篇记录恰好帮到你，也欢迎继续看看其他文章。",
+    "related": "接着读",
+    "readingTime": "约 {minutes} 分钟",
+    "shortReadingTime": "{minutes} 分钟",
+    "updated": "更新于 {date}",
+    "draft": "开发草稿",
+    "listDraft": "草稿预览",
+    "linkCard": "外部链接",
+    "videoNotice": "点击播放后才会连接第三方视频服务。",
+    "videoLink": "在原网站打开",
+    "audioFallback": "你的浏览器不支持音频播放。",
+    "chartTitle": "图表"
+  },
+  "notFound": {
+    "pageTitle": "?",
+    "description": "?what are you doing",
+    "heading": "?",
+    "body": "?",
+    "link": "回到首页"
+  }
+}

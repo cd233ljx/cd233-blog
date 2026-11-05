@@ -1,0 +1,57 @@
+---
+import path from 'node:path';
+interface Props {
+  file: string;
+}
+const { file } = Astro.props;
+const absolute = import.meta.env.DEV ? path.resolve(file) : '';
+---
+
+{
+  import.meta.env.DEV && (
+    <div class="source-link">
+      <code title={absolute}>{file}</code>
+      <button
+        type="button"
+        data-copy-source={absolute}
+        aria-label={`复制源码路径：${file}`}
+      >
+        复制路径
+      </button>
+      <span class="source-copy-status" role="status" aria-live="polite" />
+    </div>
+  )
+}
+
+<script>
+  let controller: AbortController | undefined;
+  function bindSourceLinks() {
+    controller?.abort();
+    controller = new AbortController();
+    document
+      .querySelectorAll<HTMLButtonElement>('[data-copy-source]')
+      .forEach((button) => {
+        button.addEventListener(
+          'click',
+          async () => {
+            const status =
+              button.parentElement?.querySelector<HTMLElement>(
+                '[role="status"]',
+              );
+            try {
+              await navigator.clipboard.writeText(
+                button.dataset.copySource || '',
+              );
+              if (status?.isConnected) status.textContent = '已复制';
+            } catch {
+              if (status?.isConnected)
+                status.textContent = '请选中文件路径复制';
+            }
+          },
+          { signal: controller!.signal },
+        );
+      });
+  }
+  document.addEventListener('astro:page-load', bindSourceLinks);
+  document.addEventListener('astro:before-swap', () => controller?.abort());
+</script>

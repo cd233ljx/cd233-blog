@@ -1,6 +1,4 @@
 ---
-import { ArrowUpRight } from '@lucide/astro';
-
 interface Props {
   eyebrow?: string;
   title?: string;
@@ -28,7 +26,6 @@ const {
     href && (
       <a class="text-link" href={href}>
         {linkLabel}
-        <ArrowUpRight size={16} aria-hidden="true" />
       </a>
     )
   }

@@ -1,5 +1,6 @@
 ---
-import { ArrowUpRight, ChevronDown } from '@lucide/astro';
+import { CONTENT, formatText } from '../../config/site';
+import { ChevronDown } from '@lucide/astro';
 
 import EmptyState from '../../components/EmptyState.astro';
 import BaseLayout from '../../layouts/BaseLayout.astro';
@@ -58,10 +59,13 @@ const groupedYears = [...yearMaps.entries()].map(([year, days]) => ({
 }));
 ---
 
-<BaseLayout title="归档" description="按时间回看 CD233 Blog 的全部记录。">
+<BaseLayout
+  title={CONTENT.archive.title}
+  description={CONTENT.archive.description}
+>
   <header class="page-hero page-container archive-hero">
-    <h1 class="archive-heading">归档</h1>
-    <p>按时间浏览。</p>
+    <h1 class="archive-heading">{CONTENT.archive.title}</h1>
+    <p>{CONTENT.archive.intro}</p>
   </header>
 
   <section class="listing-section page-container">
@@ -72,7 +76,11 @@ const groupedYears = [...yearMaps.entries()].map(([year, days]) => ({
             <section class="archive-year">
               <div class="archive-year-label">
                 <span>{year}</span>
-                <small>{postCount} 篇文章</small>
+                <small>
+                  {formatText(CONTENT.navigation.articleCount, {
+                    count: postCount,
+                  })}
+                </small>
               </div>
               <div class="archive-timeline">
                 {days.map((day) => (
@@ -85,8 +93,12 @@ const groupedYears = [...yearMaps.entries()].map(([year, days]) => ({
                       <details class="archive-day-details">
                         <summary class="archive-day-summary">
                           <span>
-                            <strong>{day.posts.length} 篇文章</strong>
-                            <small>展开当天记录</small>
+                            <strong>
+                              {formatText(CONTENT.navigation.articleCount, {
+                                count: day.posts.length,
+                              })}
+                            </strong>
+                            <small>{CONTENT.archive.expand}</small>
                           </span>
                           <ChevronDown size={17} aria-hidden="true" />
                         </summary>
@@ -96,7 +108,6 @@ const groupedYears = [...yearMaps.entries()].map(([year, days]) => ({
                               <span class="archive-title">
                                 {post.data.title}
                               </span>
-                              <ArrowUpRight size={16} aria-hidden="true" />
                             </a>
                           ))}
                         </div>
@@ -106,7 +117,6 @@ const groupedYears = [...yearMaps.entries()].map(([year, days]) => ({
                         {day.posts.map((post) => (
                           <a href={getPostHref(post)} class="archive-item">
                             <span class="archive-title">{post.data.title}</span>
-                            <ArrowUpRight size={16} aria-hidden="true" />
                           </a>
                         ))}
                       </div>

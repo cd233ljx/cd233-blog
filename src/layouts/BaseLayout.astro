@@ -4,7 +4,7 @@ import { ClientRouter } from 'astro:transitions';
 import AmbientBackdrop from '../components/AmbientBackdrop.astro';
 import SiteFooter from '../components/SiteFooter.astro';
 import SiteHeader from '../components/SiteHeader.astro';
-import { SITE } from '../config/site';
+import { SITE, CONTENT } from '../config/site';
 import '../styles/global.css';
 
 interface Props {
@@ -18,7 +18,7 @@ interface Props {
 const {
   title,
   description = SITE.description,
-  image,
+  image = SITE.shareImage,
   type = 'website',
   noIndex = false,
 } = Astro.props;
@@ -50,6 +50,7 @@ const websiteSchema = {
     <title>{pageTitle}</title>
     <meta name="description" content={description} />
     <link rel="canonical" href={canonical} />
+    <link rel="icon" href={SITE.icon || '/favicon.ico'} />
     <link rel="manifest" href="/site.webmanifest" />
     {noIndex && <meta name="robots" content="noindex, nofollow" />}
 
@@ -72,7 +73,7 @@ const websiteSchema = {
     <script
       is:inline
       type="application/ld+json"
-      set:html={JSON.stringify(websiteSchema)}
+      set:html={JSON.stringify(websiteSchema).replace(/</g, '\\u003c')}
     />
     <script is:inline>
       (() => {
@@ -98,8 +99,8 @@ const websiteSchema = {
     <ClientRouter fallback="animate" />
   </head>
   <body class="min-h-screen overflow-x-clip antialiased">
-    <AmbientBackdrop />
-    <a class="skip-link" href="#main-content">跳到正文</a>
+    {CONTENT.home.showBackdrop && <AmbientBackdrop />}
+    <a class="skip-link" href="#main-content">{CONTENT.navigation.skip}</a>
     <div class="site-shell">
       <SiteHeader currentPath={Astro.url.pathname} />
       <main id="main-content">

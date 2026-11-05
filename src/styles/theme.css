@@ -3,6 +3,7 @@
 :root {
   color-scheme: light;
   --paper: #ffffff;
+  --admin-danger: #b43434;
   --surface: #f7f7f7;
   --surface-muted: #f2f3f2;
   --ink: #202020;
@@ -24,6 +25,7 @@
 :root[data-theme='dark'] {
   color-scheme: dark;
   --paper: #151515;
+  --admin-danger: #f49595;
   --surface: #1e1e1e;
   --surface-muted: #252525;
   --ink: #e8e8e8;
@@ -37,6 +39,81 @@
   --reservoir-water: #20352e;
   --ambient-ink: #96a298;
   --ambient-opacity: 0.38;
+}
+
+.article-prose,
+.admin-preview {
+  --tw-prose-body: var(--body-ink);
+  --tw-prose-headings: var(--ink);
+  --tw-prose-lead: var(--body-ink);
+  --tw-prose-links: var(--red-ink);
+  --tw-prose-bold: var(--ink);
+  --tw-prose-counters: var(--muted);
+  --tw-prose-bullets: var(--muted);
+  --tw-prose-hr: var(--line);
+  --tw-prose-quotes: var(--body-ink);
+  --tw-prose-quote-borders: var(--strong-line);
+  --tw-prose-captions: var(--muted);
+  --tw-prose-code: var(--ink);
+  --tw-prose-pre-code: var(--ink);
+  --tw-prose-pre-bg: var(--surface);
+  --tw-prose-th-borders: var(--strong-line);
+  --tw-prose-td-borders: var(--line);
+  color: var(--body-ink);
+}
+
+/* The writing surface and its portalled menus share the public theme. */
+.admin-body .mdxeditor,
+.admin-body .mdxeditor-popup-container {
+  --basePageBg: var(--paper);
+  --baseBase: var(--paper);
+  --baseBgSubtle: var(--surface);
+  --baseBg: var(--surface-muted);
+  --baseBgHover: var(--surface-muted);
+  --baseBgActive: var(--reservoir-water);
+  --baseLine: var(--line);
+  --baseBorder: var(--strong-line);
+  --baseBorderHover: var(--red);
+  --baseText: var(--body-ink);
+  --baseTextContrast: var(--ink);
+  --accentBase: var(--paper);
+  --accentBgSubtle: var(--reservoir-water);
+  --accentBg: var(--reservoir-water);
+  --accentBgHover: var(--reservoir-water);
+  --accentBgActive: var(--reservoir-water);
+  --accentBorder: var(--red);
+  --accentBorderHover: var(--red-ink);
+  --accentSolid: var(--red-ink);
+  --accentSolidHover: var(--red);
+  --accentText: var(--red-ink);
+  --accentTextContrast: var(--ink);
+  --error-color: var(--admin-danger);
+  color: var(--ink);
+  background: var(--paper);
+}
+.admin-body .cm-editor {
+  background: var(--paper);
+  color: var(--ink);
+}
+.admin-body .cm-gutters {
+  background: var(--surface);
+  color: var(--muted);
+  border-color: var(--line);
+}
+.admin-body .cm-activeLine,
+.admin-body .cm-activeLineGutter {
+  background: var(--surface-muted);
+}
+.admin-body .cm-selectionBackground,
+.admin-body .cm-focused .cm-selectionBackground {
+  background: var(--reservoir-water);
+}
+.admin-body .cm-cursor {
+  border-left-color: var(--ink);
+}
+/* CodeMirror's default syntax palette is light-only. Preserve legibility in dark mode. */
+:root[data-theme='dark'] .admin-body .cm-line span {
+  color: var(--ink);
 }
 
 .ambient-backdrop {

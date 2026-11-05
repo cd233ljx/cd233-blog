@@ -1,0 +1,51 @@
+---
+import { getEntry } from 'astro:content';
+import { getSeriesPosts } from '../lib/series-order';
+import { getSeriesHref } from '../lib/series';
+import { getPostHref, type Post } from '../lib/posts';
+interface Props {
+  post: Post;
+  posts: Post[];
+}
+const { post, posts } = Astro.props;
+const entry = post.data.series ? await getEntry(post.data.series) : undefined;
+const chapters = entry ? getSeriesPosts(posts, entry.id) : [];
+const index = chapters.findIndex((chapter) => chapter.id === post.id);
+const previous = chapters[index - 1];
+const next = chapters[index + 1];
+---
+
+{
+  entry && (
+    <nav
+      class="series-navigation"
+      aria-label="系列阅读导航"
+      data-pagefind-ignore
+    >
+      <a class="series-navigation-heading" href={getSeriesHref(entry.id)}>
+        <>
+          <strong>{entry.data.title}</strong>
+          <span>目录</span>
+        </>
+      </a>
+      {(previous || next) && (
+        <div class="series-neighbors">
+          {previous ? (
+            <a href={getPostHref(previous)} rel="prev">
+              <small>上一篇</small>
+              <span>{previous.data.title}</span>
+            </a>
+          ) : (
+            <span />
+          )}
+          {next && (
+            <a href={getPostHref(next)} rel="next">
+              <small>下一篇</small>
+              <span>{next.data.title}</span>
+            </a>
+          )}
+        </div>
+      )}
+    </nav>
+  )
+}

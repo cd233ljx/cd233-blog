@@ -1,0 +1,544 @@
+[
+  {
+    "key": "identity",
+    "label": "站点资料",
+    "description": "用于站点品牌、浏览器标题、分享信息和联系链接。",
+    "fields": [
+      {
+        "key": "name",
+        "label": "站点简称 / Logo 文字",
+        "type": "text",
+        "required": true
+      },
+      {
+        "key": "title",
+        "label": "浏览器与分享标题",
+        "type": "text",
+        "required": true
+      },
+      {
+        "key": "author",
+        "label": "作者名称",
+        "type": "text",
+        "required": true
+      },
+      {
+        "key": "description",
+        "label": "站点简介 / SEO 描述",
+        "type": "textarea"
+      },
+      {
+        "key": "tagline",
+        "label": "站点短句",
+        "type": "text"
+      },
+      {
+        "key": "icon",
+        "label": "站点图标",
+        "type": "image"
+      },
+      {
+        "key": "shareImage",
+        "label": "默认分享图片",
+        "type": "image"
+      },
+      {
+        "key": "email",
+        "label": "联系邮箱",
+        "type": "email"
+      },
+      {
+        "key": "github",
+        "label": "GitHub 地址",
+        "type": "url"
+      },
+      {
+        "key": "x",
+        "label": "X 地址",
+        "type": "url"
+      },
+      {
+        "key": "bilibili",
+        "label": "哔哩哔哩地址",
+        "type": "url"
+      }
+    ]
+  },
+  {
+    "key": "home",
+    "label": "首页",
+    "description": "编辑首页介绍与栏目。正文支持 Markdown、链接和上传图片。",
+    "fields": [
+      {
+        "key": "title",
+        "label": "首页大标题",
+        "type": "text"
+      },
+      {
+        "key": "caption",
+        "label": "标题下方的小字",
+        "type": "text"
+      },
+      {
+        "key": "intro",
+        "label": "自我介绍",
+        "type": "markdown"
+      },
+      {
+        "key": "recentTitle",
+        "label": "文章栏目标题",
+        "type": "text"
+      },
+      {
+        "key": "recentLink",
+        "label": "文章栏目链接文字",
+        "type": "text"
+      },
+      {
+        "key": "recentCount",
+        "label": "首页文章数量",
+        "type": "number",
+        "min": 1,
+        "max": 30
+      },
+      {
+        "key": "showRecent",
+        "label": "显示文章栏目",
+        "type": "boolean"
+      },
+      {
+        "key": "tagsTitle",
+        "label": "标签栏目标题",
+        "type": "text"
+      },
+      {
+        "key": "tagsLink",
+        "label": "标签栏目链接文字",
+        "type": "text"
+      },
+      {
+        "key": "tagCount",
+        "label": "首页标签数量",
+        "type": "number",
+        "min": 1,
+        "max": 30
+      },
+      {
+        "key": "showTags",
+        "label": "显示标签蓄水池",
+        "type": "boolean"
+      },
+      {
+        "key": "showBackdrop",
+        "label": "显示宽屏枝条背景",
+        "type": "boolean"
+      }
+    ]
+  },
+  {
+    "key": "about",
+    "label": "关于页",
+    "description": "支持自由添加标题、段落、链接和图片。",
+    "fields": [
+      {
+        "key": "pageTitle",
+        "label": "浏览器标题",
+        "type": "text"
+      },
+      {
+        "key": "description",
+        "label": "页面简介 / SEO 描述",
+        "type": "textarea"
+      },
+      {
+        "key": "heading",
+        "label": "页面大标题",
+        "type": "text"
+      },
+      {
+        "key": "lead",
+        "label": "开场介绍",
+        "type": "markdown"
+      },
+      {
+        "key": "body",
+        "label": "正文",
+        "type": "markdown"
+      }
+    ]
+  },
+  {
+    "key": "navigation",
+    "label": "导航与公共文字",
+    "description": "链接可以添加、删除、调整顺序，支持站内路径和外部网址。",
+    "fields": [
+      {
+        "key": "items",
+        "label": "顶部导航链接",
+        "type": "links"
+      },
+      {
+        "key": "search",
+        "label": "搜索入口文字",
+        "type": "text"
+      },
+      {
+        "key": "theme",
+        "label": "主题按钮提示",
+        "type": "text"
+      },
+      {
+        "key": "skip",
+        "label": "跳到正文链接",
+        "type": "text"
+      },
+      {
+        "key": "emptyTitle",
+        "label": "文章为空时的标题",
+        "type": "text"
+      },
+      {
+        "key": "emptyDescription",
+        "label": "文章为空时的说明",
+        "type": "text"
+      },
+      {
+        "key": "articleCount",
+        "label": "文章数量格式",
+        "type": "text"
+      },
+      {
+        "key": "shortCount",
+        "label": "简短文章数量格式",
+        "type": "text"
+      }
+    ]
+  },
+  {
+    "key": "footer",
+    "label": "页脚",
+    "description": "版权文字可使用 {year} 和 {author}；备注支持 Markdown。",
+    "fields": [
+      {
+        "key": "brand",
+        "label": "页脚品牌文字",
+        "type": "text"
+      },
+      {
+        "key": "copyright",
+        "label": "版权文字",
+        "type": "text"
+      },
+      {
+        "key": "note",
+        "label": "补充说明 / 备案信息",
+        "type": "markdown"
+      },
+      {
+        "key": "links",
+        "label": "页脚导航链接",
+        "type": "links"
+      },
+      {
+        "key": "showSocial",
+        "label": "显示社交及邮箱链接",
+        "type": "boolean"
+      }
+    ]
+  },
+  {
+    "key": "posts",
+    "label": "文章列表页",
+    "description": "文章本身仍在「文章管理」里编辑。",
+    "fields": [
+      {
+        "key": "title",
+        "label": "页面标题",
+        "type": "text"
+      },
+      {
+        "key": "description",
+        "label": "页面简介 / SEO 描述",
+        "type": "textarea"
+      },
+      {
+        "key": "intro",
+        "label": "标题下方说明",
+        "type": "textarea"
+      }
+    ]
+  },
+  {
+    "key": "archive",
+    "label": "归档页",
+    "description": "日期和文章数量会随文章自动更新。",
+    "fields": [
+      {
+        "key": "title",
+        "label": "页面标题",
+        "type": "text"
+      },
+      {
+        "key": "description",
+        "label": "页面简介 / SEO 描述",
+        "type": "textarea"
+      },
+      {
+        "key": "intro",
+        "label": "标题下方说明",
+        "type": "textarea"
+      },
+      {
+        "key": "expand",
+        "label": "同一天文章展开提示",
+        "type": "text"
+      }
+    ]
+  },
+  {
+    "key": "series",
+    "label": "系列页",
+    "description": "系列列表的标题、介绍与空状态。每个系列的信息在对应目录的 series.json 中维护。",
+    "fields": [
+      {
+        "key": "title",
+        "label": "页面标题",
+        "type": "text",
+        "required": true
+      },
+      {
+        "key": "description",
+        "label": "页面摘要",
+        "type": "textarea"
+      },
+      {
+        "key": "intro",
+        "label": "页面介绍",
+        "type": "textarea"
+      },
+      {
+        "key": "empty",
+        "label": "暂无系列时的提示",
+        "type": "text"
+      }
+    ]
+  },
+  {
+    "key": "tags",
+    "label": "标签页",
+    "description": "标签名称在文章编辑器中维护，数量自动计算。",
+    "fields": [
+      {
+        "key": "title",
+        "label": "页面标题",
+        "type": "text"
+      },
+      {
+        "key": "description",
+        "label": "页面简介 / SEO 描述",
+        "type": "textarea"
+      },
+      {
+        "key": "intro",
+        "label": "标题下方说明",
+        "type": "textarea"
+      },
+      {
+        "key": "empty",
+        "label": "无标签时的提示",
+        "type": "text"
+      },
+      {
+        "key": "detailDescription",
+        "label": "标签详情简介",
+        "type": "text"
+      },
+      {
+        "key": "detailIntro",
+        "label": "标签详情说明",
+        "type": "text"
+      }
+    ]
+  },
+  {
+    "key": "search",
+    "label": "搜索页",
+    "description": "可修改输入框、结果提示和错误提示；{count} 为结果数量。",
+    "fields": [
+      {
+        "key": "title",
+        "label": "页面标题",
+        "type": "text"
+      },
+      {
+        "key": "description",
+        "label": "页面简介 / SEO 描述",
+        "type": "textarea"
+      },
+      {
+        "key": "intro",
+        "label": "标题下方说明",
+        "type": "textarea"
+      },
+      {
+        "key": "placeholder",
+        "label": "输入框占位文字",
+        "type": "text"
+      },
+      {
+        "key": "idle",
+        "label": "未输入时的提示",
+        "type": "text"
+      },
+      {
+        "key": "loading",
+        "label": "搜索中提示",
+        "type": "text"
+      },
+      {
+        "key": "results",
+        "label": "搜索结果提示",
+        "type": "text"
+      },
+      {
+        "key": "manyResults",
+        "label": "结果较多时的提示",
+        "type": "text"
+      },
+      {
+        "key": "empty",
+        "label": "没有结果时的提示",
+        "type": "text"
+      },
+      {
+        "key": "error",
+        "label": "搜索不可用时的提示",
+        "type": "text"
+      },
+      {
+        "key": "untitled",
+        "label": "没有标题时的替代文字",
+        "type": "text"
+      },
+      {
+        "key": "noscript",
+        "label": "禁用脚本时的说明",
+        "type": "text"
+      },
+      {
+        "key": "browse",
+        "label": "禁用脚本时的链接文字",
+        "type": "text"
+      }
+    ]
+  },
+  {
+    "key": "article",
+    "label": "文章阅读页",
+    "description": "正文、封面、摘要、标签与日期在文章编辑器中修改。",
+    "fields": [
+      {
+        "key": "toc",
+        "label": "目录标题",
+        "type": "text"
+      },
+      {
+        "key": "tags",
+        "label": "文末标签标题",
+        "type": "text"
+      },
+      {
+        "key": "footer",
+        "label": "文末说明",
+        "type": "markdown"
+      },
+      {
+        "key": "related",
+        "label": "相关文章栏目标题",
+        "type": "text"
+      },
+      {
+        "key": "readingTime",
+        "label": "阅读时长格式",
+        "type": "text"
+      },
+      {
+        "key": "shortReadingTime",
+        "label": "列表阅读时长格式",
+        "type": "text"
+      },
+      {
+        "key": "updated",
+        "label": "更新日期格式",
+        "type": "text"
+      },
+      {
+        "key": "draft",
+        "label": "正文草稿标识",
+        "type": "text"
+      },
+      {
+        "key": "listDraft",
+        "label": "列表草稿标识",
+        "type": "text"
+      },
+      {
+        "key": "linkCard",
+        "label": "链接卡片默认标识",
+        "type": "text"
+      },
+      {
+        "key": "videoNotice",
+        "label": "视频说明",
+        "type": "text"
+      },
+      {
+        "key": "videoLink",
+        "label": "视频外链文字",
+        "type": "text"
+      },
+      {
+        "key": "audioFallback",
+        "label": "音频不支持时的提示",
+        "type": "text"
+      },
+      {
+        "key": "chartTitle",
+        "label": "图表默认标题",
+        "type": "text"
+      }
+    ]
+  },
+  {
+    "key": "notFound",
+    "label": "404 页面",
+    "description": "访客打开不存在的地址时显示的内容。",
+    "fields": [
+      {
+        "key": "pageTitle",
+        "label": "浏览器标题",
+        "type": "text"
+      },
+      {
+        "key": "description",
+        "label": "页面简介",
+        "type": "textarea"
+      },
+      {
+        "key": "heading",
+        "label": "页面大标题",
+        "type": "text"
+      },
+      {
+        "key": "body",
+        "label": "页面说明",
+        "type": "textarea"
+      },
+      {
+        "key": "link",
+        "label": "返回首页按钮文字",
+        "type": "text"
+      }
+    ]
+  }
+]

@@ -1,4 +1,5 @@
 ---
+import { CONTENT, formatText } from '../config/site';
 import { Image } from 'astro:assets';
 
 import {
@@ -37,8 +38,14 @@ const shortDate = new Intl.DateTimeFormat('zh-CN', {
             </Heading>
             <p class="post-list-description">{post.data.description}</p>
             <div class="post-list-meta">
-              {post.data.draft && <span class="draft-badge">草稿预览</span>}
-              <span>{getReadingMinutes(post)} 分钟</span>
+              {post.data.draft && (
+                <span class="draft-badge">{CONTENT.article.listDraft}</span>
+              )}
+              <span>
+                {formatText(CONTENT.article.shortReadingTime, {
+                  minutes: getReadingMinutes(post),
+                })}
+              </span>
               <div class="tag-list" aria-label="文章标签">
                 {post.data.tags.slice(0, 3).map((tag) => (
                   <a href={getTagHref(tag)}>#{tag}</a>

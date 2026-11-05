@@ -1,0 +1,3 @@
+interface:
+  display_name: '博客写作与交互笔记'
+  short_description: '在仓库起草、改写博客与系列笔记，维护交互组件并验证实时预览'

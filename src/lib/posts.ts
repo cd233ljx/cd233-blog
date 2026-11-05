@@ -2,6 +2,7 @@ import { getCollection, type CollectionEntry } from 'astro:content';
 import readingTime from 'reading-time';
 
 import { slugifyTag } from './tags';
+import { validateSeriesPosts } from './series-order';
 
 export { slugifyTag } from './tags';
 
@@ -14,7 +15,12 @@ type GetPostsOptions = {
 export async function getPosts(options: GetPostsOptions = {}): Promise<Post[]> {
   const { includeDrafts = import.meta.env.DEV } = options;
   const now = Date.now();
-  const posts = await getCollection('posts', ({ data }) => {
+  const [entries, series] = await Promise.all([
+    getCollection('posts'),
+    getCollection('series'),
+  ]);
+  validateSeriesPosts(entries, new Set(series.map((item) => item.id)));
+  const posts = entries.filter(({ data }) => {
     if (includeDrafts) return true;
     return !data.draft && data.publishedAt.getTime() <= now;
   });

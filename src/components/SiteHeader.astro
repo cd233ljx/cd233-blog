@@ -1,7 +1,7 @@
 ---
 import { Menu, Search, X } from '@lucide/astro';
 
-import { NAV_ITEMS, SITE } from '../config/site';
+import { NAV_ITEMS, SITE, CONTENT } from '../config/site';
 import ThemeToggle from './ThemeToggle.astro';
 
 interface Props {
@@ -39,7 +39,12 @@ const isActive = (href: string) =>
     </nav>
 
     <div class="header-actions">
-      <a class="icon-button" href="/search/" aria-label="搜索文章" title="搜索">
+      <a
+        class="icon-button"
+        href="/search/"
+        aria-label="搜索文章"
+        title={CONTENT.navigation.search}
+      >
         <Search size={17} stroke-width={1.8} aria-hidden="true" />
         <span class="shortcut-hint">⌘K</span>
       </a>
@@ -77,7 +82,7 @@ const isActive = (href: string) =>
         </a>
       ))
     }
-    <a class="mobile-nav-link" href="/search/">搜索</a>
+    <a class="mobile-nav-link" href="/search/">{CONTENT.navigation.search}</a>
   </nav>
 </header>
 

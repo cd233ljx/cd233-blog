@@ -1,29 +1,49 @@
 ---
-import { ArrowUpRight } from '@lucide/astro';
-
-import { NAV_ITEMS, SITE } from '../config/site';
-
+import { CONTENT, SITE, formatText } from '../config/site';
+import { renderMarkdown } from '../lib/markdown.mjs';
 const year = new Date().getFullYear();
+const socialLinks = [
+  { href: SITE.social.github, label: 'GitHub' },
+  { href: SITE.social.x, label: 'X' },
+  { href: SITE.social.bilibili, label: 'Bilibili' },
+  { href: SITE.email ? `mailto:${SITE.email}` : '', label: SITE.email },
+].filter((link) => link.href);
 ---
 
 <footer class="site-footer">
   <div class="footer-inner">
     <div class="footer-bar">
-      <a class="footer-brand" href="/">{SITE.name}</a>
+      <a class="footer-brand" href="/">{CONTENT.footer.brand}</a>
       <nav aria-label="页脚导航">
-        {NAV_ITEMS.map((item) => <a href={item.href}>{item.label}</a>)}
+        {
+          CONTENT.footer.links.map((item) => (
+            <a href={item.href}>{item.label}</a>
+          ))
+        }
       </nav>
       <div class="footer-meta">
         {
-          SITE.social.github && (
-            <a href={SITE.social.github} target="_blank" rel="noreferrer">
-              GitHub
-              <ArrowUpRight size={14} aria-hidden="true" />
-            </a>
-          )
+          CONTENT.footer.showSocial &&
+            socialLinks.map((link) => (
+              <a href={link.href} target="_blank" rel="noreferrer">
+                {link.label}
+              </a>
+            ))
         }
-        <span>© {year} {SITE.author}</span>
+        <span
+          >{
+            formatText(CONTENT.footer.copyright, { year, author: SITE.author })
+          }</span
+        >
       </div>
     </div>
+    {
+      CONTENT.footer.note && (
+        <div
+          class="footer-note article-prose prose"
+          set:html={renderMarkdown(CONTENT.footer.note)}
+        />
+      )
+    }
   </div>
 </footer>

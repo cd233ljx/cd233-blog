@@ -1,5 +1,5 @@
 ---
-import { ArrowUpRight } from '@lucide/astro';
+import { CONTENT } from '../../config/site';
 
 interface Props {
   href: string;
@@ -8,7 +8,12 @@ interface Props {
   label?: string;
 }
 
-const { href, title, description, label = '外部链接' } = Astro.props;
+const {
+  href,
+  title,
+  description,
+  label = CONTENT.article.linkCard,
+} = Astro.props;
 const host = (() => {
   try {
     return new URL(href).hostname.replace(/^www\./, '');
@@ -23,5 +28,4 @@ const host = (() => {
   <strong>{title}</strong>
   {description && <span>{description}</span>}
   <small>{host}</small>
-  <ArrowUpRight class="link-card-arrow" size={18} aria-hidden="true" />
 </a>

@@ -1,4 +1,5 @@
 ---
+import { CONTENT, formatText } from '../../config/site';
 import PostList from '../../components/PostList.astro';
 import EmptyState from '../../components/EmptyState.astro';
 import BaseLayout from '../../layouts/BaseLayout.astro';
@@ -20,10 +21,13 @@ export async function getStaticPaths() {
 const { tag, posts } = Astro.props;
 ---
 
-<BaseLayout title={`#${tag}`} description={`所有带有“${tag}”标签的文章。`}>
+<BaseLayout
+  title={`#${tag}`}
+  description={formatText(CONTENT.tags.detailDescription, { tag })}
+>
   <header class="page-hero page-container">
     <h1>#{tag}</h1>
-    <p>共 {posts.length} 篇相关记录。</p>
+    <p>{formatText(CONTENT.tags.detailIntro, { count: posts.length })}</p>
   </header>
 
   <section class="listing-section page-container">

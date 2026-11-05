@@ -1,4 +1,5 @@
 ---
+import { CONTENT } from '../config/site';
 import { FileText } from '@lucide/astro';
 
 interface Props {
@@ -6,8 +7,10 @@ interface Props {
   description?: string;
 }
 
-const { title = '还没有文章', description = '有新的记录时，会出现在这里。' } =
-  Astro.props;
+const {
+  title = CONTENT.navigation.emptyTitle,
+  description = CONTENT.navigation.emptyDescription,
+} = Astro.props;
 ---
 
 <div class="empty-state">

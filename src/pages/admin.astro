@@ -1,0 +1,31 @@
+---
+import '../styles/global.css';
+import '../styles/admin.css';
+import { SITE } from '../config/site';
+---
+
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex,nofollow" />
+    <title>写作空间 · {SITE.name}</title>
+  </head>
+  <body class="admin-body">
+    <div id="admin-root" data-site-name={SITE.name}>
+      <p class="admin-loading" role="status">正在打开写作空间…</p>
+    </div>
+    <noscript>请启用 JavaScript 以使用写作后台。</noscript>
+    <script>
+      import '@vitejs/plugin-react/preamble';
+      import { createElement } from 'react';
+      import { createRoot } from 'react-dom/client';
+      import AdminApp from '../components/admin/AdminApp';
+      const target = document.getElementById('admin-root')!;
+      createRoot(target).render(
+        createElement(AdminApp, { siteName: target.dataset.siteName! }),
+      );
+    </script>
+  </body>
+</html>

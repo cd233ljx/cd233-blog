@@ -1,0 +1,62 @@
+---
+import { getPosts, getPostHref } from '../lib/posts';
+import { getSeriesPosts } from '../lib/series-order';
+
+interface Props {
+  series: string;
+  startOrder?: number;
+  endOrder?: number;
+  writing?: boolean;
+}
+const {
+  series,
+  startOrder = 0,
+  endOrder = Infinity,
+  writing = false,
+} = Astro.props;
+const posts = getSeriesPosts(await getPosts(), series).filter(
+  (post) => post.data.order! >= startOrder && post.data.order! <= endOrder,
+);
+---
+
+{
+  posts.length > 0 ? (
+    <ol class="series-contents not-prose">
+      {posts.map((post) => (
+        <li>
+          <span class="series-number" aria-label={`顺序 ${post.data.order}`}>
+            {post.data.order === 0
+              ? '导读'
+              : String(post.data.order).padStart(2, '0')}
+          </span>
+          <div class="series-chapter">
+            <a class="series-chapter-title" href={getPostHref(post)}>
+              {post.data.title}
+            </a>
+            {writing &&
+              import.meta.env.DEV &&
+              (post.data.draft ||
+                post.data.publishedAt.getTime() > Date.now()) && (
+                <div class="series-writing-actions">
+                  <span
+                    class:list={[
+                      'series-state',
+                      { 'is-draft': post.data.draft },
+                    ]}
+                  >
+                    {post.data.draft
+                      ? '草稿'
+                      : post.data.publishedAt.getTime() > Date.now()
+                        ? '未来日期'
+                        : '公开'}
+                  </span>
+                </div>
+              )}
+          </div>
+        </li>
+      ))}
+    </ol>
+  ) : (
+    <p class="series-empty">暂无文章。</p>
+  )
+}

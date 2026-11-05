@@ -1,4 +1,5 @@
 ---
+import { CONTENT, formatText } from '../../config/site';
 import EmptyState from '../../components/EmptyState.astro';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { getAllTags, getPosts } from '../../lib/posts';
@@ -6,10 +7,10 @@ import { getAllTags, getPosts } from '../../lib/posts';
 const tags = getAllTags(await getPosts());
 ---
 
-<BaseLayout title="标签" description="按主题浏览 CD233 Blog 的文章。">
+<BaseLayout title={CONTENT.tags.title} description={CONTENT.tags.description}>
   <header class="page-hero page-container">
-    <h1>标签</h1>
-    <p>按关键词浏览。</p>
+    <h1>{CONTENT.tags.title}</h1>
+    <p>{CONTENT.tags.intro}</p>
   </header>
 
   <section class="listing-section page-container">
@@ -19,12 +20,16 @@ const tags = getAllTags(await getPosts());
           {tags.map((tag) => (
             <a href={`/tags/${tag.slug}/`}>
               <span>#{tag.name}</span>
-              <small>{tag.count} 篇</small>
+              <small>
+                {formatText(CONTENT.navigation.shortCount, {
+                  count: tag.count,
+                })}
+              </small>
             </a>
           ))}
         </div>
       ) : (
-        <EmptyState title="标签会随着文章一起出现" />
+        <EmptyState title={CONTENT.tags.empty} />
       )
     }
   </section>

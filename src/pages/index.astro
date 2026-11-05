@@ -3,55 +3,53 @@ import EmptyState from '../components/EmptyState.astro';
 import PostList from '../components/PostList.astro';
 import SectionHeading from '../components/SectionHeading.astro';
 import TagPool from '../components/TagPool.astro';
-import { SITE } from '../config/site';
+import { CONTENT } from '../config/site';
+import { renderMarkdown } from '../lib/markdown.mjs';
 import BaseLayout from '../layouts/BaseLayout.astro';
-import { getAllTags, getPostHref, getPosts } from '../lib/posts';
+import { getAllTags, getPosts } from '../lib/posts';
 
 const posts = await getPosts();
-const featuredPost = posts.find((post) => post.data.featured);
-const latestPosts = posts.slice(0, 4);
-const tags = getAllTags(posts).slice(0, 6);
+const latestPosts = [...posts]
+  .sort((a, b) => Number(b.data.featured) - Number(a.data.featured))
+  .slice(0, CONTENT.home.recentCount);
+const tags = getAllTags(posts).slice(0, CONTENT.home.tagCount);
 ---
 
 <BaseLayout>
   <section class="home-intro page-container" aria-labelledby="home-title">
-    <h1 id="home-title">{SITE.author}</h1>
-    <p class="home-caption">cd233的个人博客~</p>
-    <div class="intro-copy">
-      <p>你好，我是 {SITE.author}。这里放我的技术笔记和日常杂谈。</p>
-      <p>
-        记一些开发中遇到的问题、折腾过的工具，也留一点技术之外的想法。
-        写下来，方便以后回来翻。
-      </p>
-      {
-        featuredPost && (
-          <p>
-            新来的话，可以从
-            <a href={getPostHref(featuredPost)}>
-              《{featuredPost.data.title}》
-            </a>
-            开始。 也可以看看<a href="/about/">关于我</a>。
-          </p>
-        )
-      }
-    </div>
-  </section>
-
-  <section id="latest" class="home-section page-container">
-    <SectionHeading title="最近的文章" href="/posts/" linkLabel="全部文章" />
-    {
-      latestPosts.length > 0 ? (
-        <PostList posts={latestPosts} headingLevel="h3" />
-      ) : (
-        <EmptyState />
-      )
-    }
+    <h1 id="home-title">{CONTENT.home.title}</h1>
+    <p class="home-caption">{CONTENT.home.caption}</p>
+    <div
+      class="intro-copy article-prose prose"
+      set:html={renderMarkdown(CONTENT.home.intro)}
+    />
   </section>
 
   {
-    tags.length > 0 && (
+    CONTENT.home.showRecent && (
+      <section id="latest" class="home-section page-container">
+        <SectionHeading
+          title={CONTENT.home.recentTitle}
+          href="/posts/"
+          linkLabel={CONTENT.home.recentLink}
+        />
+        {latestPosts.length > 0 ? (
+          <PostList posts={latestPosts} headingLevel="h3" />
+        ) : (
+          <EmptyState />
+        )}
+      </section>
+    )
+  }
+
+  {
+    CONTENT.home.showTags && tags.length > 0 && (
       <section id="topics" class="home-section topics-section page-container">
-        <SectionHeading title="按标签浏览" href="/tags/" linkLabel="全部标签" />
+        <SectionHeading
+          title={CONTENT.home.tagsTitle}
+          href="/tags/"
+          linkLabel={CONTENT.home.tagsLink}
+        />
         <TagPool tags={tags} />
       </section>
     )

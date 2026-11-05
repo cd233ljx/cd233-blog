@@ -1,0 +1,43 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getSeries, getSeriesHref } from '../../lib/series';
+import { CONTENT } from '../../config/site';
+const series = await getSeries();
+---
+
+<BaseLayout
+  title={CONTENT.series.title}
+  description={CONTENT.series.description}
+  noIndex={import.meta.env.DEV}
+>
+  <header class="page-hero page-container">
+    <h1>{CONTENT.series.title}</h1>
+  </header>
+  <section class="listing-section page-container" aria-label="全部系列">
+    {
+      series.length ? (
+        <ul class="series-list">
+          {series.map((entry) => (
+            <li>
+              <h2>
+                <a href={getSeriesHref(entry.id)}>{entry.data.title}</a>
+              </h2>
+              <span>
+                {entry.posts.length} 篇
+                {import.meta.env.DEV &&
+                  ` · ${entry.posts.filter((post) => post.data.draft).length} 篇草稿`}
+              </span>
+              <a class="series-enter" href={getSeriesHref(entry.id)}>
+                目录
+              </a>
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <p>
+          {CONTENT.series.empty} <a href="/posts/">浏览全部文章</a>
+        </p>
+      )
+    }
+  </section>
+</BaseLayout>

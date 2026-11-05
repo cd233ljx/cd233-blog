@@ -1,10 +1,11 @@
 ---
+import { CONTENT } from '../../config/site';
 interface Props {
   chart: string;
   title?: string;
 }
 
-const { chart, title = '图表' } = Astro.props;
+const { chart, title = CONTENT.article.chartTitle } = Astro.props;
 ---
 
 <figure class="mermaid-figure">

@@ -1,5 +1,6 @@
 ---
-import { ExternalLink, Play } from '@lucide/astro';
+import { CONTENT } from '../../config/site';
+import { Play } from '@lucide/astro';
 
 interface Props {
   provider: 'youtube' | 'bilibili';
@@ -40,10 +41,9 @@ const watchUrl =
     </div>
   </div>
   <figcaption>
-    点击播放后才会连接第三方视频服务。
+    {CONTENT.article.videoNotice}
     <a href={watchUrl} target="_blank" rel="noreferrer">
-      在原网站打开
-      <ExternalLink size={13} aria-hidden="true" />
+      {CONTENT.article.videoLink}
     </a>
   </figcaption>
 </figure>

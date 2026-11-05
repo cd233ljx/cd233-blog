@@ -1,4 +1,5 @@
 ---
+import { CONTENT } from '../../config/site';
 import { AudioLines } from '@lucide/astro';
 
 interface Props {
@@ -17,6 +18,6 @@ const { src, title, description } = Astro.props;
     {description && <span>{description}</span>}
   </figcaption>
   <audio controls preload="metadata" src={src}>
-    你的浏览器不支持音频播放。
+    {CONTENT.article.audioFallback}
   </audio>
 </figure>

@@ -1,22 +1,25 @@
+import content from './site-content.json';
+
+// Public origin stays here; editable content never changes deployment/auth origins.
 export const SITE = {
-  name: 'CD233',
-  title: 'CD233 Blog',
-  description: '记录技术实践、学习笔记和日常杂谈。',
-  tagline: '技术笔记和日常杂谈，留着以后翻。',
+  ...content.identity,
   url: 'https://blog.utopiacd.online',
   locale: 'zh-CN',
   language: 'zh',
-  author: 'CD233',
-  email: '',
   social: {
-    github: '',
-    x: '',
-    bilibili: '',
+    github: content.identity.github,
+    x: content.identity.x,
+    bilibili: content.identity.bilibili,
   },
 } as const;
 
-export const NAV_ITEMS = [
-  { href: '/posts/', label: '文章' },
-  { href: '/archive/', label: '归档' },
-  { href: '/about/', label: '关于' },
-] as const;
+export const CONTENT = content;
+export const NAV_ITEMS = content.navigation.items;
+export function formatText(
+  template: string,
+  values: Record<string, string | number>,
+) {
+  return template.replace(/\{(\w+)\}/g, (match, key: string) =>
+    String(Object.hasOwn(values, key) ? values[key] : match),
+  );
+}
