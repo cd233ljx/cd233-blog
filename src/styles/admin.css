@@ -595,6 +595,16 @@
   padding: 3rem clamp(1.25rem, 4vw, 4rem) 5rem;
   min-width: 0;
 }
+.article-canvas:has(.note-workspace.mode-split) {
+  max-width: none;
+  padding: 1.5rem clamp(0.75rem, 1.25vw, 1.5rem) 2rem;
+}
+.article-canvas:has(.note-workspace.mode-split) .article-heading {
+  padding-bottom: 1rem;
+}
+.article-canvas:has(.note-workspace.mode-split) .article-kicker {
+  margin-bottom: 0.65rem;
+}
 .note-workspace {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
