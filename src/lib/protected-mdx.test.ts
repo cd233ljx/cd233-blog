@@ -1,5 +1,4 @@
 import { describe, expect, it } from 'vitest';
-import { readFileSync, readdirSync } from 'node:fs';
 import { protectMdx, restoreMdx } from './protected-mdx';
 
 describe('editing text around preserved MDX', () => {
@@ -20,19 +19,47 @@ describe('editing text around preserved MDX', () => {
       restoreMdx(document.markdown + '\n' + document.markdown, document),
     ).toThrow('组件块无效');
   });
-  it('round-trips every imported algorithm article without changing its source', () => {
-    const folder = new URL(
-      '../content/posts/algorithm-notes/articles/',
-      import.meta.url,
-    );
-    for (const file of readdirSync(folder)) {
-      if (!file.endsWith('.mdx')) continue;
-      const body = readFileSync(new URL(file, folder), 'utf8').replace(
-        /^---\r?\n[\s\S]*?\r?\n---\r?\n/,
+  it.each(['\n', '\r\n'])(
+    'round-trips a standalone MDX fixture with %j line endings',
+    (newline) => {
+      // Test data must not depend on private articles stored on the writing host.
+      const body = [
+        'import { Demo } from "../components/Demo";',
         '',
-      );
+        '# 测试样例',
+        '',
+        '| 表达式 | 结果 |',
+        '| --- | --- |',
+        '| $x_{i}$ | {2 + 2} |',
+        '',
+        '1. 列表中的 **文字** 与 $n^2$。',
+        '   - 嵌套项中的 `code`。',
+        '',
+        '<Callout title="示例">',
+        '',
+        '组件内的文字与 $a+b$。',
+        '',
+        '</Callout>',
+        '',
+        '$$',
+        '\\sum_{i=1}^{n} i = \\frac{n(n+1)}{2}',
+        '$$',
+        '',
+        '<Demo client:visible />',
+        '',
+        '```js',
+        'const value = "<Demo />";',
+        '```',
+        '',
+      ].join(newline);
       const document = protectMdx(body);
-      expect(restoreMdx(document.markdown, document), file).toBe(body);
-    }
-  });
+      expect(restoreMdx(document.markdown, document)).toBe(body);
+      expect(
+        restoreMdx(
+          document.markdown.replace('测试样例', '已修改标题'),
+          document,
+        ),
+      ).toBe(body.replace('测试样例', '已修改标题'));
+    },
+  );
 });

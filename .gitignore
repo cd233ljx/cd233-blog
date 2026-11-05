@@ -28,3 +28,9 @@ pnpm-debug.log*
 
 # private admin state and build releases
 .admin-data/
+
+# Authored posts stay on the writing host; code and series metadata are tracked.
+/src/content/posts/*.md
+/src/content/posts/*.mdx
+/src/content/posts/*/articles/*.md
+/src/content/posts/*/articles/*.mdx

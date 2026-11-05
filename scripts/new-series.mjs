@@ -35,7 +35,7 @@ export async function createSeries(args, directory = POSTS) {
   );
   await writeFile(
     path.join(folder, 'README.md'),
-    `# ${title}\n\n- articles/：文章，使用固定 slug、series 和 order。\n- components/：本系列的交互组件与计算逻辑。\n- assets/：图片等素材。\n- notes/：素材与备忘，不作为文章读取；公开仓库中仍应避免提交私密信息。\n\n本地入口：/series/${id}/\n\n新增文章：npm run new:post -- 文章地址 "文章标题" --series ${id}\n\n先让 AI 读取最新内容，再修改指定范围；保留人工修订，用 Git 留版本。发布前运行 npm run verify。\n`,
+    `# ${title}\n\n- articles/：文章，使用固定 slug、series 和 order。\n- components/：本系列的交互组件与计算逻辑。\n- assets/：图片等素材。\n- notes/：素材与备忘，不作为文章读取；公开仓库中仍应避免提交私密信息。\n\n本地入口：/series/${id}/\n\n新增文章：npm run new:post -- 文章地址 "文章标题" --series ${id}\n\n先让 AI 读取最新内容，再修改指定范围；保留人工修订，文章不提交 Git，交接保留私有备份；组件与配置使用 Git 留版本。发布前运行 npm run verify。\n`,
     { flag: 'wx' },
   );
   return folder;

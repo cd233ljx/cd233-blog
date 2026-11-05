@@ -13,6 +13,7 @@ import { createBatchedTask } from '../../lib/batched-task';
 import HistoryDialog from './HistoryDialog';
 import PreviewDialog from './PreviewDialog';
 import LocalPreview from './LocalPreview';
+import { useSplitScroll } from './useSplitScroll';
 import { drafts } from '../../lib/draft-store';
 import PublishDialog from './PublishDialog';
 const SourceEditor = lazy(() => import('./SourceEditor'));
@@ -100,6 +101,7 @@ export default function ArticleEditor({
   const [history, setHistory] = useState(false);
   const [preview, setPreview] = useState(false);
   const [mode, setMode] = useState<'edit' | 'split' | 'read'>('split');
+  const splitRoot = useSplitScroll(mode === 'split' && !preview);
   const [externalPost, setExternalPost] = useState<Post | null>(null);
   const [syncError, setSyncError] = useState('');
   const [publish, setPublish] = useState<'publish' | 'unpublish' | null>(null);
@@ -583,7 +585,7 @@ export default function ArticleEditor({
             {dirty || saving ? '本地预览 · 后台同步中' : '本地预览 · 已同步'}
           </span>
         </div>
-        <div className={`note-workspace mode-${mode}`}>
+        <div ref={splitRoot} className={`note-workspace mode-${mode}`}>
           <section
             className="note-source-pane"
             aria-label="Markdown 编辑"

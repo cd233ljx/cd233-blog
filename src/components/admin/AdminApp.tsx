@@ -5,6 +5,7 @@ import {
   useState,
   type SubmitEvent,
 } from 'react';
+import { BookOpen, LogOut, PanelLeftClose, PanelLeftOpen } from 'lucide-react';
 import { api, dateText, status, type Post, type Publication } from './client';
 import { Icon, Modal, Empty, ErrorMessage } from './ui';
 import ArticleEditor from './ArticleEditor';
@@ -87,6 +88,28 @@ export default function AdminApp({ siteName }: { siteName: string }) {
   const [expired, setExpired] = useState(false);
   const [view, setView] = useState<View>('posts');
   const [editorReturn, setEditorReturn] = useState<View>('posts');
+  const [selectedSeriesId, setSelectedSeriesId] = useState<string | null>(null);
+  const [sidebarPreference, setSidebarPreference] = useState<boolean | null>(
+    () => {
+      try {
+        const value = localStorage.getItem('admin:sidebar:v1');
+        return value === 'collapsed'
+          ? true
+          : value === 'expanded'
+            ? false
+            : null;
+      } catch {
+        return null;
+      }
+    },
+  );
+  const [compactViewport, setCompactViewport] = useState(
+    () =>
+      typeof window !== 'undefined' &&
+      window.matchMedia('(max-width: 950px)').matches,
+  );
+  const sidebarCollapsed =
+    sidebarPreference ?? (view === 'editor' || compactViewport);
   const [posts, setPosts] = useState<Post[]>([]);
   const [selected, setSelected] = useState<Post | undefined>();
   const [editorKey, setEditorKey] = useState(0);
@@ -134,6 +157,25 @@ export default function AdminApp({ siteName }: { siteName: string }) {
       .then(() => setAuthenticated(true))
       .catch(() => setAuthenticated(false));
   }, []);
+  useEffect(() => {
+    const media = window.matchMedia('(max-width: 950px)');
+    const update = () => setCompactViewport(media.matches);
+    update();
+    media.addEventListener('change', update);
+    return () => media.removeEventListener('change', update);
+  }, []);
+  function toggleSidebar() {
+    const collapsed = !sidebarCollapsed;
+    setSidebarPreference(collapsed);
+    try {
+      localStorage.setItem(
+        'admin:sidebar:v1',
+        collapsed ? 'collapsed' : 'expanded',
+      );
+    } catch {
+      /* Keep the current choice even when preference storage is unavailable. */
+    }
+  }
   useEffect(() => {
     document.documentElement.dataset.theme = dark ? 'dark' : 'light';
     try {
@@ -255,24 +297,42 @@ export default function AdminApp({ siteName }: { siteName: string }) {
   if (!authenticated)
     return <Login siteName={siteName} onLogin={() => setAuthenticated(true)} />;
   return (
-    <div className="admin-app">
+    <div className={`admin-app ${sidebarCollapsed ? 'sidebar-collapsed' : ''}`}>
       <aside className="admin-sidebar">
-        <a className="sidebar-brand" href="/" target="_blank" rel="noopener">
-          <span className="brand-mark">C</span>
-          <span>
-            {siteName}
-            <small>写作空间</small>
-          </span>
-        </a>
+        <div className="sidebar-heading">
+          <a className="sidebar-brand" href="/" target="_blank" rel="noopener">
+            <span>
+              {siteName}
+              <small>写作空间</small>
+            </span>
+          </a>
+          <button
+            type="button"
+            className="icon-button sidebar-toggle"
+            onClick={toggleSidebar}
+            aria-label={sidebarCollapsed ? '展开侧边栏' : '收起侧边栏'}
+            title={sidebarCollapsed ? '展开侧边栏' : '收起侧边栏'}
+            aria-expanded={!sidebarCollapsed}
+            aria-controls="admin-navigation"
+          >
+            {sidebarCollapsed ? (
+              <PanelLeftOpen size={19} aria-hidden="true" />
+            ) : (
+              <PanelLeftClose size={19} aria-hidden="true" />
+            )}
+          </button>
+        </div>
         <button
           type="button"
           className="admin-primary new-post-button"
+          aria-label="写文章"
+          title="写文章"
           onClick={() => navigate('editor')}
         >
           <Icon name="plus" />
-          写文章
+          <span>写文章</span>
         </button>
-        <nav aria-label="后台导航">
+        <nav id="admin-navigation" aria-label="后台导航">
           {(
             [
               {
@@ -295,6 +355,8 @@ export default function AdminApp({ siteName }: { siteName: string }) {
             <button
               type="button"
               key={item.key}
+              aria-label={item.name}
+              title={item.name}
               aria-current={
                 view === item.key ||
                 (item.key === editorReturn && view === 'editor')
@@ -303,22 +365,44 @@ export default function AdminApp({ siteName }: { siteName: string }) {
               }
               onClick={() => navigate(item.key)}
             >
-              <Icon name={item.icon} />
+              {item.key === 'series' ? (
+                <BookOpen size={18} aria-hidden="true" />
+              ) : (
+                <Icon name={item.icon} />
+              )}
               <span>{item.name}</span>
               {'count' in item && <small>{item.count}</small>}
             </button>
           ))}
         </nav>
         <div className="sidebar-bottom">
-          <a href="/" target="_blank" rel="noopener">
-            查看博客
+          <a
+            href="/"
+            target="_blank"
+            rel="noopener"
+            aria-label="查看博客"
+            title="查看博客"
+          >
+            <Icon name="eye" />
+            <span>查看博客</span>
           </a>
-          <button type="button" onClick={() => setDark(!dark)}>
+          <button
+            type="button"
+            onClick={() => setDark(!dark)}
+            aria-label={dark ? '切换浅色外观' : '切换深色外观'}
+            title={dark ? '浅色外观' : '深色外观'}
+          >
             <Icon name="moon" />
-            {dark ? '浅色外观' : '深色外观'}
+            <span>{dark ? '浅色外观' : '深色外观'}</span>
           </button>
-          <button type="button" onClick={() => void logout()}>
-            退出登录
+          <button
+            type="button"
+            onClick={() => void logout()}
+            aria-label="退出登录"
+            title="退出登录"
+          >
+            <LogOut size={18} aria-hidden="true" />
+            <span>退出登录</span>
           </button>
         </div>
       </aside>
@@ -486,6 +570,8 @@ export default function AdminApp({ siteName }: { siteName: string }) {
         )}
         {view === 'series' && (
           <SeriesManager
+            initialSelectedId={selectedSeriesId}
+            onSelect={setSelectedSeriesId}
             onOpen={(post) => navigate('editor', post)}
             onDirty={onDirty}
             onSaved={() => void refresh()}

@@ -5,3 +5,7 @@ node_modules
 package-lock.json
 public/pagefind
 .admin-data
+src/content/posts/*.md
+src/content/posts/*.mdx
+src/content/posts/*/articles/*.md
+src/content/posts/*/articles/*.mdx
