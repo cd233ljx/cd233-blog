@@ -622,8 +622,10 @@
 .note-preview-pane[hidden] {
   display: none;
 }
-.note-workspace .admin-source .cm-editor {
-  height: 70vh;
+.note-workspace .admin-source .cm-editor,
+.note-workspace .local-preview {
+  /* Leave enough document height to scroll the article heading out of view. */
+  height: calc(100dvh - 90px);
 }
 .note-workspace .admin-source .cm-scroller {
   overflow: auto;
