@@ -102,6 +102,7 @@ export default function ArticleEditor({
   const [preview, setPreview] = useState(false);
   const [mode, setMode] = useState<'edit' | 'split' | 'read'>('split');
   const splitRoot = useSplitScroll(mode === 'split' && !preview);
+  const paneScrollPositions = useRef(new WeakMap<HTMLElement, number>());
   const [externalPost, setExternalPost] = useState<Post | null>(null);
   const [syncError, setSyncError] = useState('');
   const [publish, setPublish] = useState<'publish' | 'unpublish' | null>(null);
@@ -585,7 +586,31 @@ export default function ArticleEditor({
             {dirty || saving ? '本地预览 · 后台同步中' : '本地预览 · 已同步'}
           </span>
         </div>
-        <div ref={splitRoot} className={`note-workspace mode-${mode}`}>
+        <div
+          ref={splitRoot}
+          className={`note-workspace mode-${mode}`}
+          onScrollCapture={(event) => {
+            const pane = event.target;
+            if (
+              !(pane instanceof HTMLElement) ||
+              !pane.matches('.cm-scroller, .local-preview')
+            )
+              return;
+            const previous = paneScrollPositions.current.get(pane) ?? 0;
+            paneScrollPositions.current.set(pane, pane.scrollTop);
+            if (pane.scrollTop <= previous) return;
+            const workspace = event.currentTarget;
+            const toolbar = workspace
+              .closest('.article-workspace')
+              ?.querySelector('.editor-topbar');
+            const offset =
+              workspace.getBoundingClientRect().top -
+              (toolbar?.getBoundingClientRect().height ?? 0) -
+              8;
+            if (offset > 1)
+              window.scrollBy({ top: offset, behavior: 'instant' });
+          }}
+        >
           <section
             className="note-source-pane"
             aria-label="Markdown 编辑"
